@@ -13,9 +13,9 @@ namespace mnenComponent {
     public template: string = `
       <div class="container-fluid">
         <h1>Election Night in Minnesota</h1>
-        Next check <span am-time-ago="$ctrl.nextUpdate"></span>
+        Checks for new data every five minutes. Next check <span am-time-ago="$ctrl.nextUpdate"></span>
         <div class="card-columns">
-          <div ng-repeat="race in $ctrl.racesArray | orderBy: '-updated' track by race.id " class="card">
+          <div ng-repeat="race in $ctrl.racesArray | orderBy: '-updated' track by race.id" class="card">
             <div class="card-block">
               <h5 class="card-title">{{race.office}}</h5>
               <h6 class="card-subtitle text-muted">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>
@@ -23,6 +23,7 @@ namespace mnenComponent {
             </div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item" ng-repeat="candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id">
+                <div class="fill-bar" style="width: {{candidate.percentage}}%" ng-class="{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}"></div>
                 {{candidate.name}} - {{candidate.party}}
                 <span class="float-xs-right">{{candidate.votes}}</span>
               </li>
