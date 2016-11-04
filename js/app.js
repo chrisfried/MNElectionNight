@@ -2,7 +2,9 @@ var pawdModule;
 (function (pawdModule) {
     'use strict';
     angular
-        .module('mnen', []);
+        .module('mnen', [
+        'angularMoment'
+    ]);
 })(pawdModule || (pawdModule = {}));
 /// <reference path="mnen.module.ts" />
 var mnenService;
@@ -14,7 +16,9 @@ var mnenService;
             this.getResults = this.getResultsFunction;
         }
         MnenService.prototype.getResultsFunction = function (list) {
-            return this.$http.get('/Results/MediaResult/99?mediafileid=' + list)
+            var race = '1'; // 2012
+            //  let race = '99'; // 2016 Primary
+            return this.$http.get('/Results/MediaResult/' + race + '?mediafileid=' + list)
                 .then(this.getResultsComplete)
                 .catch(this.getResultsFailed);
         };
@@ -40,12 +44,15 @@ var mnenComponent;
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <div class=\"container-fluid\">\n        <h1>Election Night in Minnesota</h1>\n        \n        <div class=\"card-columns\">\n          <div ng-repeat=\"race in $ctrl.races\" class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">{{race.office}}</h5>\n              <h6 class=\"card-subtitle text-muted\">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>\n            </div>\n            <ul class=\"list-group list-group-flush\">\n              <li class=\"list-group-item\" ng-repeat=\"candidate in race.candidates\">{{candidate.name}} - {{candidate.party}}</li>\n            </ul>\n          </div>\n        </div>\n      </div>";
+            this.template = "\n      <div class=\"container-fluid\">\n        <h1>Election Night in Minnesota</h1>\n        Next check <span am-time-ago=\"$ctrl.nextUpdate\"></span>\n        <div class=\"card-columns\">\n          <div ng-repeat=\"race in $ctrl.racesArray | orderBy: '-updated' track by race.id \" class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">{{race.office}}</h5>\n              <h6 class=\"card-subtitle text-muted\">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>\n              Updated <span am-time-ago=\"race.updated\"></span>\n            </div>\n            <ul class=\"list-group list-group-flush\">\n              <li class=\"list-group-item\" ng-repeat=\"candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n                {{candidate.name}} - {{candidate.party}}\n                <span class=\"float-xs-right\">{{candidate.votes}}</span>\n              </li>\n            </ul>\n            <div class=\"card-footer text-muted\">\n              Total Votes Cast\n              <span class=\"float-xs-right\">{{race.votes}}</span>\n            </div>\n          </div>\n        </div>\n      </div>";
         }
-        MnenComponent.prototype.controller = function (MnenService) {
+        MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
             vm.races = {};
+            vm.racesArray = [];
             vm.$onInit = activate;
+            vm.lastUpdate = Date.now();
+            vm.nextUpdate = vm.lastUpdate + 300000;
             function activate() {
                 MnenService.getResults('20') // State House
                     .then(function (data) {
@@ -71,6 +78,10 @@ var mnenComponent;
                     .then(function (data) {
                     updateData(data);
                 });
+                vm.lastUpdate = Date.now();
+                vm.nextUpdate = vm.lastUpdate + 300000;
+                console.log(vm.lastUpdate);
+                $timeout(activate, 300000);
             }
             function updateData(data) {
                 var dataArray = data.split('\n');
@@ -79,31 +90,41 @@ var mnenComponent;
                     var race = entry[3];
                     if (!race || race == '&nbsp' || race.length < 2)
                         continue;
-                    if (!vm.races[race])
+                    if (!vm.races[race]) {
                         vm.races[race] = {
+                            id: race,
                             office: entry[4],
                             district: entry[5],
                             reporting: entry[11],
                             precincts: entry[12],
                             votes: entry[15],
                             candidates: {},
+                            candidatesArray: [],
                             updated: Date.now()
                         };
+                        vm.racesArray.push(vm.races[race]);
+                    }
+                    ;
                     var candidate = entry[6];
-                    if (!vm.races[race]['candidates'][candidate])
+                    if (!vm.races[race]['candidates'][candidate]) {
                         vm.races[race]['candidates'][candidate] = {
+                            id: candidate,
                             name: entry[7],
                             party: entry[10],
                             votes: entry[13],
+                            votesInt: parseInt(entry[13]),
                             percentage: entry[14]
                         };
+                        vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
+                    }
+                    ;
                     if (vm.races[race].reporting !== entry[11] ||
-                        vm.races[race].votes !== entry[15] ||
                         vm.races[race]['candidates'][candidate].votes !== entry[13] ||
                         vm.races[race]['candidates'][candidate].percentage !== entry[14]) {
                         vm.races[race].reporting = entry[11];
                         vm.races[race].votes = entry[15];
                         vm.races[race]['candidates'][candidate].votes = entry[13];
+                        vm.races[race]['candidates'][candidate].votesInt = parseInt(entry[13]);
                         vm.races[race]['candidates'][candidate].percentage = entry[14];
                         vm.races[race].updated = Date.now();
                     }

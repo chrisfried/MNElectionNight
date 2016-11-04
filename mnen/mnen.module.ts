@@ -3,5 +3,6 @@ namespace pawdModule {
 
   angular
     .module('mnen', [
+      'angularMoment'
     ]);
 }
