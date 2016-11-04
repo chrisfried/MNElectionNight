@@ -1,0 +1,21 @@
+{
+  "name": "election-night-mn",
+  "version": "0.0.1",
+  "description": "Election Night Thing",
+  "main": "app.js",
+  "dependencies": {
+    "angular": "^1.5.3",
+    "core-js": "^2.4.0",
+    "express": "^4.14.0",
+    "path": "^0.12.7",
+    "pug": "^2.0.0-beta6",
+    "request": "^2.78.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "devDependencies": {
+    "typescript": "^2.0.7"
+  }
+}

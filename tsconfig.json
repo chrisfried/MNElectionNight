@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "out": "js/app.js",
+    "watch": true,
+    "sourceMap": true
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "node_modules"
+  ]
+}
