@@ -49,7 +49,7 @@ var mnenEditComponent;
                 races: '<',
                 toggle: '<'
             };
-            this.template = "\n        <div class=\"card-columns\">\n          <div class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">Settings</h5>\n              <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n              <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Settings</button>\n            </div>\n          </div>\n          <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n            <div class=\"card-block\">\n              <h6>{{::option.name}}</h6>\n              <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\" aria-label=\"Basic example\">\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                  {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n                </button>\n              </div></p>\n              <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n                <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{race.office}}</button>\n              </div>\n            </div>\n          </div>\n        </div>\n      ";
+            this.template = "\n        <div class=\"card-columns\">\n          <div class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">Select Races</h5>\n              <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n              <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Selector</button>\n            </div>\n          </div>\n          <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n            <div class=\"card-block\">\n              <h6>{{::option.name}}</h6>\n              <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\" aria-label=\"Basic example\">\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                  {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n                </button>\n              </div></p>\n              <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n                <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{race.office}}</button>\n              </div>\n            </div>\n          </div>\n        </div>\n      ";
         }
         MnenEditComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -60,27 +60,27 @@ var mnenEditComponent;
             vm.options = [
                 {
                     id: 22,
-                    name: 'Presidential'
+                    name: 'U.S. Presidential Race'
                 },
                 {
                     id: 24,
-                    name: 'U.S. House'
+                    name: 'U.S. Congressional Races'
                 },
                 {
                     id: 30,
-                    name: 'State Senate'
+                    name: 'MN State Senate Races'
                 },
                 {
                     id: 20,
-                    name: 'State Representatives'
+                    name: 'MN State Representative Races'
                 },
                 {
                     id: 66,
-                    name: 'Constitutional Amendment'
+                    name: 'MN Constitutional Amendments'
                 },
                 {
                     id: 37,
-                    name: 'Supreme Court, Court of Appeals'
+                    name: 'MN Judicial Races'
                 }
             ];
             function toggleList(listId) {
@@ -93,15 +93,19 @@ var mnenEditComponent;
             function selectAll(listId) {
                 for (var i in vm.lists[listId].races) {
                     vm.lists[listId].races[i].visible = true;
+                    localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
                 }
             }
             function selectNone(listId) {
                 for (var i in vm.lists[listId].races) {
+                    console.log();
                     vm.lists[listId].races[i].visible = false;
+                    localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
                 }
             }
             function toggleRace(raceId) {
                 vm.races[raceId].visible = !vm.races[raceId].visible;
+                localStorage[raceId] = vm.races[raceId].visible;
             }
             console.log(vm.lists);
             console.log(vm.options);
@@ -120,7 +124,7 @@ var mnenComponent;
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <div class=\"container-fluid\">\n        <h1>Election Night in Minnesota</h1>\n        Checks for new data every five minutes. Next check <span am-time-ago=\"$ctrl.nextUpdate\"></span>\n        <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.toggleSettings()\">Settings</button>\n        <mnen-edit lists=\"$ctrl.listsObject\" toggle=\"$ctrl.toggleSettings\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.edit\"></mnen-edit>\n        <div class=\"card-columns\">\n          <div ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\" class=\"card\">\n            <div class=\"card-block\">\n              <div class=\"fill-bar precincts\" style=\"width: {{race.percentageReporting}}%\"></div>\n              <h5 class=\"card-title\">{{race.office}}</h5>\n              <h6 class=\"card-subtitle text-muted\">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>\n              <span ng-if=\"race.percentageReporting !== 100\" Updated <span am-time-ago=\"race.updated\"></span></span>\n            </div>\n            <ul class=\"list-group list-group-flush\">\n              <li class=\"list-group-item\" ng-repeat=\"candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n                <span class=\"float-xs-right\">{{candidate.votes}}</span>\n                <div class=\"fill-bar\" style=\"width: {{candidate.percentage}}%\" ng-class=\"{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}\"></div>\n                {{candidate.name}} - {{candidate.party}}\n              </li>\n            </ul>\n            <div class=\"card-footer text-muted\">\n              Total Votes Cast\n              <span class=\"float-xs-right\">{{race.votes}}</span>\n            </div>\n          </div>\n        </div>\n      </div>";
+            this.template = "\n      <div class=\"container-fluid\">\n        <h1>Election Night in Minnesota</h1>\n        <p class=\"lead\">\n          Checks for new data every five minutes. Next check <span am-time-ago=\"$ctrl.nextUpdate\"></span>. \n          <button ng-if=\"!$ctrl.edit\" type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.toggleSettings()\">Select Races</button>\n        </p>\n        <mnen-edit lists=\"$ctrl.listsObject\" toggle=\"$ctrl.toggleSettings\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.edit\"></mnen-edit>\n        <div class=\"card-columns\">\n          <div ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\" class=\"card\">\n            <div class=\"card-block\">\n              <div class=\"fill-bar precincts\" style=\"width: {{race.percentageReporting}}%\"></div>\n              <h5 class=\"card-title\">{{race.office}}</h5>\n              <h6 class=\"card-subtitle text-muted\">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>\n              <span ng-if=\"race.percentageReporting !== 100\" Updated <span am-time-ago=\"race.updated\"></span></span>\n            </div>\n            <ul class=\"list-group list-group-flush\">\n              <li class=\"list-group-item\" ng-repeat=\"candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n                <span class=\"float-xs-right\">{{candidate.votes}}</span>\n                <div class=\"fill-bar\" style=\"width: {{candidate.percentage}}%\" ng-class=\"{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}\"></div>\n                {{candidate.name}} - {{candidate.party}}\n              </li>\n            </ul>\n            <div class=\"card-footer text-muted\">\n              Total Votes Cast\n              <span class=\"float-xs-right\">{{race.votes}}</span>\n            </div>\n          </div>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -190,9 +194,12 @@ var mnenComponent;
                             candidatesArray: [],
                             percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
                             updated: Date.now(),
-                            visible: true,
                             list: vm.listsObject[list]
                         };
+                        if (localStorage[race])
+                            vm.races[race].visible = JSON.parse(localStorage[race]);
+                        else
+                            vm.races[race].visible = true;
                         vm.racesArray.push(vm.races[race]);
                         vm.listsObject[list]['races'].push(vm.races[race]);
                     }

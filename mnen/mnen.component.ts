@@ -19,8 +19,10 @@ namespace mnenComponent {
     public template: string = `
       <div class="container-fluid">
         <h1>Election Night in Minnesota</h1>
-        Checks for new data every five minutes. Next check <span am-time-ago="$ctrl.nextUpdate"></span>
-        <button type="button" class="btn btn-outline-primary" ng-click="$ctrl.toggleSettings()">Settings</button>
+        <p class="lead">
+          Checks for new data every five minutes. Next check <span am-time-ago="$ctrl.nextUpdate"></span>. 
+          <button ng-if="!$ctrl.edit" type="button" class="btn btn-outline-primary" ng-click="$ctrl.toggleSettings()">Select Races</button>
+        </p>
         <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSettings" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.edit"></mnen-edit>
         <div class="card-columns">
           <div ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id" class="card">
@@ -116,9 +118,12 @@ namespace mnenComponent {
               candidatesArray: [],
               percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
               updated: Date.now(),
-              visible: true,
-              list: vm.listsObject[list] 
+              list: vm.listsObject[list]
             };
+
+            if (localStorage[race]) vm.races[race].visible = JSON.parse(localStorage[race]);
+            else vm.races[race].visible = true;
+
             vm.racesArray.push(vm.races[race]);
             vm.listsObject[list]['races'].push(vm.races[race]);
           };

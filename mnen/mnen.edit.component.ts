@@ -25,9 +25,9 @@ namespace mnenEditComponent {
         <div class="card-columns">
           <div class="card">
             <div class="card-block">
-              <h5 class="card-title">Settings</h5>
+              <h5 class="card-title">Select Races</h5>
               <p><h6 class="card-subtitle text-muted">Choose which elections to watch.</h6></p>
-              <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggle()">Hide Settings</button>
+              <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggle()">Hide Selector</button>
             </div>
           </div>
           <div class="card" ng-repeat="option in $ctrl.options track by option.id">
@@ -59,27 +59,27 @@ namespace mnenEditComponent {
       vm.options = [
         {
           id: 22,
-          name: 'Presidential'
+          name: 'U.S. Presidential Race'
         }
         {
           id: 24,
-          name: 'U.S. House'
+          name: 'U.S. Congressional Races'
         },
         {
           id: 30,
-          name: 'State Senate'
+          name: 'MN State Senate Races'
         },
         {
           id: 20,
-          name: 'State Representatives'
+          name: 'MN State Representative Races'
         },
         {
           id: 66,
-          name: 'Constitutional Amendment'
+          name: 'MN Constitutional Amendments'
         },
         {
           id: 37,
-          name: 'Supreme Court, Court of Appeals'
+          name: 'MN Judicial Races'
         }
       ];
 
@@ -92,17 +92,21 @@ namespace mnenEditComponent {
       function selectAll(listId) {
         for (let i in vm.lists[listId].races) {
           vm.lists[listId].races[i].visible = true;
+          localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
         }
       }
 
       function selectNone(listId) {
         for (let i in vm.lists[listId].races) {
+          console.log();
           vm.lists[listId].races[i].visible = false;
+          localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
         }
       }
 
       function toggleRace(raceId) {
         vm.races[raceId].visible = !vm.races[raceId].visible;
+        localStorage[raceId] = vm.races[raceId].visible;
       }
 
       console.log(vm.lists);
