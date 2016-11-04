@@ -28,7 +28,7 @@ namespace mnenComponent {
           <div ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id" class="card">
             <div class="card-block">
               <div class="fill-bar precincts" style="width: {{race.percentageReporting}}%"></div>
-              <h5 class="card-title">{{race.office}}</h5>
+              <h5 class="card-title">{{::race.office}}</h5>
               <h6 class="card-subtitle text-muted">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>
               <span ng-if="race.percentageReporting !== 100" Updated <span am-time-ago="race.updated"></span></span>
             </div>
@@ -36,7 +36,7 @@ namespace mnenComponent {
               <li class="list-group-item" ng-repeat="candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id">
                 <span class="float-xs-right">{{candidate.votes}}</span>
                 <div class="fill-bar" style="width: {{candidate.percentage}}%" ng-class="{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}"></div>
-                {{candidate.name}} - {{candidate.party}}
+                {{::candidate.name}} - {{::candidate.party}}
               </li>
             </ul>
             <div class="card-footer text-muted">

@@ -41,7 +41,7 @@ namespace mnenEditComponent {
                 </button>
               </div></p>
               <div class="btn-group-vertical" ng-if="$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2">
-                <button ng-repeat="race in $ctrl.lists[option.id].races" type="button" class="btn btn-outline-success" ng-class="{'active': race.visible}" ng-click="$ctrl.toggleRace(race.id)">{{race.office}}</button>
+                <button ng-repeat="race in $ctrl.lists[option.id].races" type="button" class="btn btn-outline-success" ng-class="{'active': race.visible}" ng-click="$ctrl.toggleRace(race.id)">{{::race.office}}</button>
               </div>
             </div>
           </div>
