@@ -5,9 +5,37 @@
   bottom: 0;
   background-color: rgba(100,100,100,.2);
 }
+.precincts {
+  background-color: rgba(200,255,200,.2);
+}
 .dfl {
   background-color: rgba(100,100,255,.2);
 }
 .gop {
   background-color: rgba(255,100,100,.2);
+}
+.card-block {
+  position: relative;
+}
+.btn-outline-primary:active, .btn-outline-primary:focus{
+  color: #0275d8;
+  background-image: none;
+  background-color: transparent;
+  border-color: #0275d8;
+}
+.btn-outline-success:active, .btn-outline-success:focus{
+  color: #5cb85c;
+  background-image: none;
+  background-color: transparent;
+  border-color: #5cb85c;
+}
+@media (min-width: 1300px) {
+  .card-columns {
+    column-count: 4;
+  }
+}
+@media (min-width: 1700px) {
+  .card-columns {
+    column-count: 5;
+  }
 }

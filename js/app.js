@@ -38,52 +38,140 @@ var mnenService;
         .service('MnenService', MnenService);
 })(mnenService || (mnenService = {}));
 /// <reference path="mnen.module.ts" />
+var mnenEditComponent;
+(function (mnenEditComponent) {
+    'use strict';
+    var MnenEditComponent = (function () {
+        function MnenEditComponent() {
+            this.bindings = {
+                lists: '<',
+                update: '<',
+                races: '<',
+                toggle: '<'
+            };
+            this.template = "\n        <div class=\"card-columns\">\n          <div class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">Settings</h5>\n              <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n              <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Settings</button>\n            </div>\n          </div>\n          <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n            <div class=\"card-block\">\n              <h6>{{::option.name}}</h6>\n              <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\" aria-label=\"Basic example\">\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                  {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n                </button>\n              </div></p>\n              <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n                <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{race.office}}</button>\n              </div>\n            </div>\n          </div>\n        </div>\n      ";
+        }
+        MnenEditComponent.prototype.controller = function (MnenService, $timeout) {
+            var vm = this;
+            vm.toggleList = toggleList;
+            vm.toggleRace = toggleRace;
+            vm.selectAll = selectAll;
+            vm.selectNone = selectNone;
+            vm.options = [
+                {
+                    id: 22,
+                    name: 'Presidential'
+                },
+                {
+                    id: 24,
+                    name: 'U.S. House'
+                },
+                {
+                    id: 30,
+                    name: 'State Senate'
+                },
+                {
+                    id: 20,
+                    name: 'State Representatives'
+                },
+                {
+                    id: 66,
+                    name: 'Constitutional Amendment'
+                },
+                {
+                    id: 37,
+                    name: 'Supreme Court, Court of Appeals'
+                }
+            ];
+            function toggleList(listId) {
+                if (vm.lists[listId])
+                    vm.lists[listId].visible = !vm.lists[listId].visible;
+                else
+                    vm.update(listId);
+                console.log(listId);
+            }
+            function selectAll(listId) {
+                for (var i in vm.lists[listId].races) {
+                    vm.lists[listId].races[i].visible = true;
+                }
+            }
+            function selectNone(listId) {
+                for (var i in vm.lists[listId].races) {
+                    vm.lists[listId].races[i].visible = false;
+                }
+            }
+            function toggleRace(raceId) {
+                vm.races[raceId].visible = !vm.races[raceId].visible;
+            }
+            console.log(vm.lists);
+            console.log(vm.options);
+        };
+        return MnenEditComponent;
+    }());
+    angular
+        .module('mnen')
+        .component('mnenEdit', new MnenEditComponent());
+})(mnenEditComponent || (mnenEditComponent = {}));
+/// <reference path="mnen.module.ts" />
 /// <reference path="mnen.service.ts" />
+/// <reference path="mnen.edit.component.ts" />
 var mnenComponent;
 (function (mnenComponent) {
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <div class=\"container-fluid\">\n        <h1>Election Night in Minnesota</h1>\n        Checks for new data every five minutes. Next check <span am-time-ago=\"$ctrl.nextUpdate\"></span>\n        <div class=\"card-columns\">\n          <div ng-repeat=\"race in $ctrl.racesArray | orderBy: '-updated' track by race.id\" class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">{{race.office}}</h5>\n              <h6 class=\"card-subtitle text-muted\">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>\n              Updated <span am-time-ago=\"race.updated\"></span>\n            </div>\n            <ul class=\"list-group list-group-flush\">\n              <li class=\"list-group-item\" ng-repeat=\"candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n                <div class=\"fill-bar\" style=\"width: {{candidate.percentage}}%\" ng-class=\"{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}\"></div>\n                {{candidate.name}} - {{candidate.party}}\n                <span class=\"float-xs-right\">{{candidate.votes}}</span>\n              </li>\n            </ul>\n            <div class=\"card-footer text-muted\">\n              Total Votes Cast\n              <span class=\"float-xs-right\">{{race.votes}}</span>\n            </div>\n          </div>\n        </div>\n      </div>";
+            this.template = "\n      <div class=\"container-fluid\">\n        <h1>Election Night in Minnesota</h1>\n        Checks for new data every five minutes. Next check <span am-time-ago=\"$ctrl.nextUpdate\"></span>\n        <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.toggleSettings()\">Settings</button>\n        <mnen-edit lists=\"$ctrl.listsObject\" toggle=\"$ctrl.toggleSettings\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.edit\"></mnen-edit>\n        <div class=\"card-columns\">\n          <div ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\" class=\"card\">\n            <div class=\"card-block\">\n              <div class=\"fill-bar precincts\" style=\"width: {{race.percentageReporting}}%\"></div>\n              <h5 class=\"card-title\">{{race.office}}</h5>\n              <h6 class=\"card-subtitle text-muted\">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>\n              <span ng-if=\"race.percentageReporting !== 100\" Updated <span am-time-ago=\"race.updated\"></span></span>\n            </div>\n            <ul class=\"list-group list-group-flush\">\n              <li class=\"list-group-item\" ng-repeat=\"candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n                <span class=\"float-xs-right\">{{candidate.votes}}</span>\n                <div class=\"fill-bar\" style=\"width: {{candidate.percentage}}%\" ng-class=\"{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}\"></div>\n                {{candidate.name}} - {{candidate.party}}\n              </li>\n            </ul>\n            <div class=\"card-footer text-muted\">\n              Total Votes Cast\n              <span class=\"float-xs-right\">{{race.votes}}</span>\n            </div>\n          </div>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
+            vm.lists = [
+                '20',
+                '22',
+                '24',
+                '30',
+                '37',
+                '66' // Amendment
+            ];
+            vm.listsObject = {};
             vm.races = {};
             vm.racesArray = [];
+            vm.edit = false;
+            vm.toggleSettings = toggleSettings;
             vm.$onInit = activate;
+            vm.updateList = updateList;
             vm.lastUpdate = Date.now();
             vm.nextUpdate = vm.lastUpdate + 300000;
             function activate() {
-                MnenService.getResults('20') // State House
-                    .then(function (data) {
-                    updateData(data);
-                });
-                MnenService.getResults('22') // Presidential
-                    .then(function (data) {
-                    updateData(data);
-                });
-                MnenService.getResults('24') // US House
-                    .then(function (data) {
-                    updateData(data);
-                });
-                MnenService.getResults('30') // State Senate
-                    .then(function (data) {
-                    updateData(data);
-                });
-                MnenService.getResults('37') // MN Supreme Court
-                    .then(function (data) {
-                    updateData(data);
-                });
-                MnenService.getResults('66') // Amendment
-                    .then(function (data) {
-                    updateData(data);
-                });
+                var _loop_1 = function(i) {
+                    MnenService.getResults(vm.lists[i])
+                        .then(function (data) {
+                        updateData(data, vm.lists[i]);
+                    });
+                };
+                for (var i in vm.lists) {
+                    _loop_1(i);
+                }
                 vm.lastUpdate = Date.now();
                 vm.nextUpdate = vm.lastUpdate + 300000;
                 console.log(vm.lastUpdate);
                 $timeout(activate, 300000);
             }
-            function updateData(data) {
+            function toggleSettings() {
+                vm.edit = !vm.edit;
+            }
+            function updateList(list) {
+                MnenService.getResults(list)
+                    .then(function (data) {
+                    updateData(data, list);
+                });
+            }
+            function updateData(data, list) {
+                if (!vm.listsObject[list]) {
+                    vm.listsObject[list] = {
+                        races: [],
+                        visible: false
+                    };
+                }
                 var dataArray = data.split('\n');
                 for (var i = 0; i < dataArray.length; i++) {
                     var entry = dataArray[i].split(';');
@@ -100,9 +188,13 @@ var mnenComponent;
                             votes: entry[15],
                             candidates: {},
                             candidatesArray: [],
-                            updated: Date.now()
+                            percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
+                            updated: Date.now(),
+                            visible: true,
+                            list: vm.listsObject[list]
                         };
                         vm.racesArray.push(vm.races[race]);
+                        vm.listsObject[list]['races'].push(vm.races[race]);
                     }
                     ;
                     var candidate = entry[6];
@@ -122,6 +214,7 @@ var mnenComponent;
                         vm.races[race]['candidates'][candidate].votes !== entry[13] ||
                         vm.races[race]['candidates'][candidate].percentage !== entry[14]) {
                         vm.races[race].reporting = entry[11];
+                        vm.races[race].percentageReporting = parseInt(entry[11]) / parseInt(entry[12]) * 100;
                         vm.races[race].votes = entry[15];
                         vm.races[race]['candidates'][candidate].votes = entry[13];
                         vm.races[race]['candidates'][candidate].votesInt = parseInt(entry[13]);
@@ -129,7 +222,6 @@ var mnenComponent;
                         vm.races[race].updated = Date.now();
                     }
                 }
-                console.log(vm.races);
             }
         };
         return MnenComponent;
