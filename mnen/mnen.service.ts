@@ -4,14 +4,14 @@ namespace mnenService {
 
   export class MnenService {
     static $inject: Array<string> = ['$http'];
-    public getResults: () => ng.IHttpPromise<any>;
+    public getResults: (list: string) => ng.IHttpPromise<any>;
 
     constructor(private $http: ng.IHttpService) {
       this.getResults = this.getResultsFunction;
     }
 
-    private getResultsFunction() {
-      return this.$http.get('/Results/MediaResult/20?mediafileid=20')
+    private getResultsFunction(list) {
+      return this.$http.get('/Results/MediaResult/99?mediafileid=' + list)
         .then(this.getResultsComplete)
         .catch(this.getResultsFailed);
     }
