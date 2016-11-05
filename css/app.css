@@ -17,13 +17,13 @@
 .card-block {
   position: relative;
 }
-.btn-outline-primary:active, .btn-outline-primary:focus{
+.btn-outline-primary:active, .btn-outline-primary:focus, .btn-outline-primary:hover {
   color: #0275d8;
   background-image: none;
   background-color: transparent;
   border-color: #0275d8;
 }
-.btn-outline-success:active, .btn-outline-success:focus{
+.btn-outline-success:active, .btn-outline-success:focus, .btn-outline-success:hover {
   color: #5cb85c;
   background-image: none;
   background-color: transparent;
