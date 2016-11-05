@@ -17,17 +17,27 @@
 .card-block {
   position: relative;
 }
-.btn-outline-primary:active, .btn-outline-primary:focus, .btn-outline-primary:hover {
+.btn-outline-primary:active, .btn-outline-primary:focus, .btn-outline-primary:active:focus, .btn-outline-primary:hover, .btn-outline-primary:active:hover {
   color: #0275d8;
   background-image: none;
   background-color: transparent;
   border-color: #0275d8;
 }
-.btn-outline-success:active, .btn-outline-success:focus, .btn-outline-success:hover {
+.btn-outline-success:active, .btn-outline-success:focus, .btn-outline-success:active:focus, .btn-outline-success:hover, .btn-outline-success:active:hover {
   color: #5cb85c;
   background-image: none;
   background-color: transparent;
   border-color: #5cb85c;
+}
+.btn-outline-success.active:active, .btn-outline-success.active:focus, .btn-outline-success.active:hover {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+.btn-outline-primary.active:active, .btn-outline-primary.active:focus, .btn-outline-primary.active:hover {
+  color: #fff;
+  background-color: #0275d8;
+  border-color: #0275d8;
 }
 .list-group {
   max-height: 292px;
