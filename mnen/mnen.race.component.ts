@@ -16,7 +16,7 @@ namespace mnenRaceComponent {
         <div class="fill-bar precincts" style="width: {{$ctrl.race.percentageReporting}}%"></div>
         <h5 class="card-title">{{::$ctrl.race.office}}</h5>
         <h6 class="card-subtitle text-muted">{{$ctrl.race.reporting}} of {{::$ctrl.race.precincts}} Precincts Reporting</h6>
-        <span ng-if="$ctrl.race.percentageReporting !== 100" Updated <span am-time-ago="$ctrl.race.updated"></span></span>
+        <span ng-if="$ctrl.race.percentageReporting !== 100">Updated {{ $ctrl.race.updated | date:'h:mma'}}</span>
       </div>
       <ul class="list-group list-group-flush">
         <li class="list-group-item" ng-repeat="candidate in $ctrl.race.candidatesArray | orderBy: '-votesInt' track by candidate.id">
