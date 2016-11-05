@@ -5,7 +5,7 @@ namespace mnenSettingsComponent {
   class MnenSettingsComponent implements ng.IComponentOptions {
 
     public bindings: { [binding: string]: string } = {
-      toggleSettings: '<',
+      toggle: '<',
       settings: '<'
     };
 
@@ -20,7 +20,7 @@ namespace mnenSettingsComponent {
           <div class="card-block">
             <h5 class="card-title">Settings</h5>
             <p><h6 class="card-subtitle text-muted">Toggles for days!</h6></p>
-            <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggleSettings()">Hide Settings</button>
+            <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggle()">Hide Settings</button>
           </div>
         </div>
 

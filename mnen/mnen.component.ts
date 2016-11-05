@@ -36,7 +36,7 @@ namespace mnenComponent {
       </nav>
       <div class="container-fluid navbar-offset">
         <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.showEdit"></mnen-edit>
-        <mnen-settings settings="$ctrl.settings" toggleSettings="$ctrl.toggleSettings" ng-if="$ctrl.showSettings"></mnen-settings>
+        <mnen-settings settings="$ctrl.settings" toggle="$ctrl.toggleSettings" ng-if="$ctrl.showSettings"></mnen-settings>
         <div class="card-columns">
           <mnen-race race="race" settings="$ctrl.settings" class="card" ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id"></mnen-race>
         </div>
