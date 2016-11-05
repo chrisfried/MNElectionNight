@@ -29,6 +29,23 @@
   background-color: transparent;
   border-color: #5cb85c;
 }
+.list-group {
+  max-height: 292px;
+  overflow-y: auto;
+}
+.btn-group-vertical {
+  max-height: 297px;
+  overflow-y: auto;
+}
+.winner {
+  font-weight: bold;
+}
+.navbar-offset {
+  padding-top: 69px;
+}
+.countdown {
+  color: #fff;
+}
 @media (min-width: 1300px) {
   .card-columns {
     column-count: 4;

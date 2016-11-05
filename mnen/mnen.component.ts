@@ -1,5 +1,6 @@
 /// <reference path="mnen.module.ts" />
 /// <reference path="mnen.service.ts" />
+/// <reference path="mnen.race.component.ts" />
 /// <reference path="mnen.edit.component.ts" />
 namespace mnenComponent {
   'use strict';
@@ -13,37 +14,29 @@ namespace mnenComponent {
     private lastUpdate: number;
     private nextUpdate: number;
     private edit: boolean;
+    private settings: boolean;
     private updateList: (list: string | number) => void;
+    private toggleSelectors: () => void;
     private toggleSettings: () => void;
 
     public template: string = `
-      <div class="container-fluid">
-        <h1>Election Night in Minnesota</h1>
-        <p class="lead">
-          Checks for new data every five minutes. Next check <span am-time-ago="$ctrl.nextUpdate"></span>. 
-          <button ng-if="!$ctrl.edit" type="button" class="btn btn-outline-primary" ng-click="$ctrl.toggleSettings()">Select Races</button>
-        </p>
-        <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSettings" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.edit"></mnen-edit>
+      <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+        <span class="navbar-text float-xs-right countdown">next check <span am-time-ago="$ctrl.nextUpdate"></span></span>
+        <a class="navbar-brand" href="#">MN Election Night</a>
+        <ul class="nav navbar-nav">
+          <li class="nav-item" ng-class="{ 'active': $ctrl.edit }">
+            <a class="nav-link" href="#" ng-click="$ctrl.toggleSelectors()">Select Races</a>
+          </li>
+          <li class="nav-item" ng-class="{ 'active': $ctrl.settings }">
+            <a class="nav-link" href="#" ng-click="$ctrl.toggleSettings()">Settings</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="container-fluid navbar-offset">
+        <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.edit"></mnen-edit>
+        <mnen-settings></mnen-settings>
         <div class="card-columns">
-          <div ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id" class="card">
-            <div class="card-block">
-              <div class="fill-bar precincts" style="width: {{race.percentageReporting}}%"></div>
-              <h5 class="card-title">{{::race.office}}</h5>
-              <h6 class="card-subtitle text-muted">{{race.reporting}} of {{::race.precincts}} Precincts Reporting</h6>
-              <span ng-if="race.percentageReporting !== 100" Updated <span am-time-ago="race.updated"></span></span>
-            </div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item" ng-repeat="candidate in race.candidatesArray | orderBy: '-votesInt' track by candidate.id">
-                <span class="float-xs-right">{{candidate.votes}}</span>
-                <div class="fill-bar" style="width: {{candidate.percentage}}%" ng-class="{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}"></div>
-                {{::candidate.name}} - {{::candidate.party}}
-              </li>
-            </ul>
-            <div class="card-footer text-muted">
-              Total Votes Cast
-              <span class="float-xs-right">{{race.votes}}</span>
-            </div>
-          </div>
+          <mnen-race race="race" class="card" ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id"></mnen-race>
         </div>
       </div>`;
 
@@ -62,6 +55,8 @@ namespace mnenComponent {
       vm.races = {};
       vm.racesArray = [];
       vm.edit = false;
+      vm.settings = false;
+      vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
 
       vm.$onInit = activate;
@@ -83,8 +78,12 @@ namespace mnenComponent {
         $timeout(activate, 300000);
       }
 
-      function toggleSettings() {
+      function toggleSelectors() {
         vm.edit = !vm.edit;
+      }
+
+      function toggleSettings() {
+        vm.settings = !vm.settings;
       }
 
       function updateList(list) {

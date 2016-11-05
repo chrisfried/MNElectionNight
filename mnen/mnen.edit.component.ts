@@ -27,7 +27,7 @@ namespace mnenEditComponent {
             <div class="card-block">
               <h5 class="card-title">Select Races</h5>
               <p><h6 class="card-subtitle text-muted">Choose which elections to watch.</h6></p>
-              <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggle()">Hide Selector</button>
+              <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggle()">Hide Selectors</button>
             </div>
           </div>
           <div class="card" ng-repeat="option in $ctrl.options track by option.id">
