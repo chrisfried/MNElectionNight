@@ -270,7 +270,7 @@ var mnenComponent;
                             votes: entry[13],
                             votesInt: parseInt(entry[13]),
                             percentage: entry[14],
-                            percentageInt: parseInt(entry[14])
+                            percentageInt: parseFloat(entry[14])
                         };
                         vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
                     }
