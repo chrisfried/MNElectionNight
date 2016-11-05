@@ -29,7 +29,7 @@ namespace mnenComponent {
           <li class="nav-item" ng-class="{ 'active': $ctrl.showEdit }">
             <a class="nav-link" href="#" ng-click="$ctrl.toggleSelectors()">Select Races</a>
           </li>
-          <li class="nav-item" ng-class="{ 'active': $ctrl.settings }">
+          <li class="nav-item" ng-class="{ 'active': $ctrl.showSettings }">
             <a class="nav-link" href="#" ng-click="$ctrl.toggleSettings()">Settings</a>
           </li>
         </ul>
