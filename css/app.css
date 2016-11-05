@@ -56,6 +56,9 @@
 .countdown {
   color: #fff;
 }
+.capitalize {
+  text-transform: capitalize;
+}
 @media (min-width: 575px) and (max-width: 960px) {
   .card-columns {
     column-count: 2;

@@ -25,7 +25,7 @@ namespace mnenEditComponent {
       <div class="card-columns">
         <div class="card">
           <div class="card-block">
-            <h5 class="card-title">Select Races</h5>
+            <h5 class="card-title">&#x1F3C1; Select Races</h5>
             <p><h6 class="card-subtitle text-muted">Choose which elections to watch.</h6></p>
             <button type="button" class="btn btn-outline-danger" ng-click="$ctrl.toggle()">Hide Selectors</button>
           </div>
