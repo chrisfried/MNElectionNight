@@ -27,10 +27,10 @@ namespace mnenComponent {
         <a class="navbar-brand" href="#">MN Election Night</a>
         <ul class="nav navbar-nav">
           <li class="nav-item" ng-class="{ 'active': $ctrl.showEdit }">
-            <a class="nav-link" href="#" ng-click="$ctrl.toggleSelectors()">Select Races</a>
+            <a class="nav-link" href="#" ng-click="$ctrl.toggleSelectors()">&#x1F3C1;</a>
           </li>
           <li class="nav-item" ng-class="{ 'active': $ctrl.showSettings }">
-            <a class="nav-link" href="#" ng-click="$ctrl.toggleSettings()">Settings</a>
+            <a class="nav-link" href="#" ng-click="$ctrl.toggleSettings()">&#9881;</a>
           </li>
         </ul>
       </nav>
