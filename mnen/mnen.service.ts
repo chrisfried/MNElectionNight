@@ -11,8 +11,9 @@ namespace mnenService {
     }
 
     private getResultsFunction(list) {
-      let race = '1'; // 2012
+    //  let race = '1'; // 2012
     //  let race = '99'; // 2016 Primary
+      let race = '100';
       return this.$http.get('/Results/MediaResult/' + race + '?mediafileid=' + list)
         .then(this.getResultsComplete)
         .catch(this.getResultsFailed);

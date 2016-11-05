@@ -14,8 +14,7 @@ namespace mnenRaceComponent {
       <div class="card-block">
         <div class="fill-bar precincts" style="width: {{$ctrl.race.percentageReporting}}%"></div>
         <h5 class="card-title">{{::$ctrl.race.office}}</h5>
-        <h6 class="card-subtitle text-muted">{{$ctrl.race.reporting}} of {{::$ctrl.race.precincts}} Precincts Reporting</h6>
-        <span ng-if="$ctrl.race.percentageReporting !== 100">Updated {{ $ctrl.race.updated | date:'h:mma'}}</span>
+        <h6 class="card-subtitle text-muted" ng-class="{'incomplete': $ctrl.race.percentageReporting < 100}">{{$ctrl.race.reporting}} of {{::$ctrl.race.precincts}} Precincts Reporting<span ng-if="$ctrl.race.percentageReporting !== 100"> @ {{ $ctrl.race.updated | date:'h:mma'}}</span></h6>
       </div>
       <ul class="list-group list-group-flush">
         <li ng-if="candidate.percentageInt >= $ctrl.settings.threshold" class="list-group-item" ng-repeat="candidate in $ctrl.race.candidatesArray | orderBy: '-votesInt' track by candidate.id">

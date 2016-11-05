@@ -59,6 +59,9 @@
 .capitalize {
   text-transform: capitalize;
 }
+.incomplete {
+  font-weight: normal;
+}
 @media (min-width: 575px) and (max-width: 960px) {
   .card-columns {
     column-count: 2;
