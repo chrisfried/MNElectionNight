@@ -45,9 +45,10 @@ var mnenRaceComponent;
     var MnenRaceComponent = (function () {
         function MnenRaceComponent() {
             this.bindings = {
-                race: '<'
+                race: '<',
+                settings: '<'
             };
-            this.template = "\n      <div class=\"card-block\">\n        <div class=\"fill-bar precincts\" style=\"width: {{$ctrl.race.percentageReporting}}%\"></div>\n        <h5 class=\"card-title\">{{::$ctrl.race.office}}</h5>\n        <h6 class=\"card-subtitle text-muted\">{{$ctrl.race.reporting}} of {{::$ctrl.race.precincts}} Precincts Reporting</h6>\n        <span ng-if=\"$ctrl.race.percentageReporting !== 100\">Updated {{ $ctrl.race.updated | date:'h:mma'}}</span>\n      </div>\n      <ul class=\"list-group list-group-flush\">\n        <li class=\"list-group-item\" ng-repeat=\"candidate in $ctrl.race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n          <span class=\"float-xs-right\">{{candidate.votes}}</span>\n          <div class=\"fill-bar\" style=\"width: {{candidate.percentage}}%\" ng-class=\"{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}\"></div>\n          <span ng-class=\"{'winner': $first && $ctrl.race.percentageReporting === 100}\">{{::candidate.name}} - {{::candidate.party}}</span>\n        </li>\n      </ul>\n      <div class=\"card-footer text-muted\">\n        Total Votes Cast\n        <span class=\"float-xs-right\">{{$ctrl.race.votes}}</span>\n      </div>";
+            this.template = "\n      <div class=\"card-block\">\n        <div class=\"fill-bar precincts\" style=\"width: {{$ctrl.race.percentageReporting}}%\"></div>\n        <h5 class=\"card-title\">{{::$ctrl.race.office}}</h5>\n        <h6 class=\"card-subtitle text-muted\">{{$ctrl.race.reporting}} of {{::$ctrl.race.precincts}} Precincts Reporting</h6>\n        <span ng-if=\"$ctrl.race.percentageReporting !== 100\">Updated {{ $ctrl.race.updated | date:'h:mma'}}</span>\n      </div>\n      <ul class=\"list-group list-group-flush\">\n        <li ng-if=\"candidate.percentageInt >= $ctrl.settings.threshold\" class=\"list-group-item\" ng-repeat=\"candidate in $ctrl.race.candidatesArray | orderBy: '-votesInt' track by candidate.id\">\n          <span class=\"float-xs-right\">\n            <span ng-if=\"$ctrl.settings.votePercent\">{{candidate.percentage}}%</span>\n            <span ng-if=\"$ctrl.settings.voteCount && $ctrl.settings.votePercent\"> - </span>\n            <span ng-if=\"$ctrl.settings.voteCount\">{{candidate.votes}}</span>\n          </span>\n          <div class=\"fill-bar\" style=\"width: {{candidate.percentage}}%\" ng-class=\"{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}\"></div>\n          <span ng-class=\"{'winner': $first && $ctrl.race.percentageReporting === 100}\">{{::candidate.name}}<span ng-if=\"$ctrl.settings.partyText\"> - {{::candidate.party}}</span></span>\n        </li>\n      </ul>\n      <div class=\"card-footer text-muted\">\n        Total Votes Cast\n        <span class=\"float-xs-right\">{{$ctrl.race.votes}}</span>\n      </div>";
         }
         return MnenRaceComponent;
     }());
@@ -67,7 +68,7 @@ var mnenEditComponent;
                 races: '<',
                 toggle: '<'
             };
-            this.template = "\n        <div class=\"card-columns\">\n          <div class=\"card\">\n            <div class=\"card-block\">\n              <h5 class=\"card-title\">Select Races</h5>\n              <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n              <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Selectors</button>\n            </div>\n          </div>\n          <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n            <div class=\"card-block\">\n              <h6>{{::option.name}}</h6>\n              <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\" aria-label=\"Basic example\">\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n                <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                  {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n                </button>\n              </div></p>\n              <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n                <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{::race.office}}</button>\n              </div>\n            </div>\n          </div>\n        </div>\n      ";
+            this.template = "\n      <div class=\"card-columns\">\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">Select Races</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Selectors</button>\n          </div>\n        </div>\n        <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n          <div class=\"card-block\">\n            <h6>{{::option.name}}</h6>\n            <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n              </button>\n            </div></p>\n            <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n              <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{::race.office}}</button>\n            </div>\n          </div>\n        </div>\n      </div>";
         }
         MnenEditComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -106,7 +107,6 @@ var mnenEditComponent;
                     vm.lists[listId].visible = !vm.lists[listId].visible;
                 else
                     vm.update(listId);
-                console.log(listId);
             }
             function selectAll(listId) {
                 for (var i in vm.lists[listId].races) {
@@ -116,7 +116,6 @@ var mnenEditComponent;
             }
             function selectNone(listId) {
                 for (var i in vm.lists[listId].races) {
-                    console.log();
                     vm.lists[listId].races[i].visible = false;
                     localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
                 }
@@ -125,8 +124,6 @@ var mnenEditComponent;
                 vm.races[raceId].visible = !vm.races[raceId].visible;
                 localStorage[raceId] = vm.races[raceId].visible;
             }
-            console.log(vm.lists);
-            console.log(vm.options);
         };
         return MnenEditComponent;
     }());
@@ -135,15 +132,46 @@ var mnenEditComponent;
         .component('mnenEdit', new MnenEditComponent());
 })(mnenEditComponent || (mnenEditComponent = {}));
 /// <reference path="mnen.module.ts" />
+var mnenSettingsComponent;
+(function (mnenSettingsComponent) {
+    'use strict';
+    var MnenSettingsComponent = (function () {
+        function MnenSettingsComponent() {
+            this.bindings = {
+                toggleSettings: '<',
+                settings: '<'
+            };
+            this.template = "\n      <div class=\"card-columns\">\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">Settings</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Toggles for days!</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggleSettings()\">Hide Settings</button>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Candidate Votes</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.voteCount}\" ng-click=\"$ctrl.toggleSetting('voteCount')\">Count</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.votePercent}\" ng-click=\"$ctrl.toggleSetting('votePercent')\">Percent</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Party Initials</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.partyText}\" ng-click=\"$ctrl.toggleSetting('partyText')\">Display</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Hide By Vote Threshold</h6>\n            <p><div class=\"input-group\">\n              <input type=\"text\" class=\"form-control\" ng-model=\"$ctrl.settings.threshold\" ng-change=\"$ctrl.saveSettings()\">\n              <span class=\"input-group-addon\">%</span>\n            </div></p>\n          </div>\n        </div>\n\n      </div>";
+        }
+        MnenSettingsComponent.prototype.controller = function () {
+            var vm = this;
+            vm.toggleSetting = toggleSetting;
+            vm.saveSettings = saveSettings;
+            function toggleSetting(setting) {
+                vm.settings[setting] = !vm.settings[setting];
+                saveSettings();
+            }
+            function saveSettings() {
+                localStorage['settings'] = angular.toJson(vm.settings);
+            }
+        };
+        return MnenSettingsComponent;
+    }());
+    angular
+        .module('mnen')
+        .component('mnenSettings', new MnenSettingsComponent());
+})(mnenSettingsComponent || (mnenSettingsComponent = {}));
+/// <reference path="mnen.module.ts" />
 /// <reference path="mnen.service.ts" />
 /// <reference path="mnen.race.component.ts" />
 /// <reference path="mnen.edit.component.ts" />
+/// <reference path="mnen.settings.component.ts" />
 var mnenComponent;
 (function (mnenComponent) {
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">next check <span am-time-ago=\"$ctrl.nextUpdate\"></span></span>\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.edit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">Select Races</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.settings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">Settings</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.edit\"></mnen-edit>\n        <mnen-settings></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-race race=\"race\" class=\"card\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
+            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">next check <span am-time-ago=\"$ctrl.nextUpdate\"></span></span>\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">Select Races</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.settings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">Settings</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggleSettings=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-race race=\"race\" settings=\"$ctrl.settings\" class=\"card\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -158,10 +186,16 @@ var mnenComponent;
             vm.listsObject = {};
             vm.races = {};
             vm.racesArray = [];
-            vm.edit = false;
-            vm.settings = false;
+            vm.showEdit = false;
+            vm.showSettings = false;
             vm.toggleSelectors = toggleSelectors;
             vm.toggleSettings = toggleSettings;
+            vm.settings = angular.fromJson(localStorage['settings']) || {
+                voteCount: true,
+                votePercent: false,
+                partyText: true,
+                threshold: 0
+            };
             vm.$onInit = activate;
             vm.updateList = updateList;
             vm.lastUpdate = Date.now();
@@ -178,14 +212,13 @@ var mnenComponent;
                 }
                 vm.lastUpdate = Date.now();
                 vm.nextUpdate = vm.lastUpdate + 300000;
-                console.log(vm.lastUpdate);
                 $timeout(activate, 300000);
             }
             function toggleSelectors() {
-                vm.edit = !vm.edit;
+                vm.showEdit = !vm.showEdit;
             }
             function toggleSettings() {
-                vm.settings = !vm.settings;
+                vm.showSettings = !vm.showSettings;
             }
             function updateList(list) {
                 MnenService.getResults(list)
@@ -236,7 +269,8 @@ var mnenComponent;
                             party: entry[10],
                             votes: entry[13],
                             votesInt: parseInt(entry[13]),
-                            percentage: entry[14]
+                            percentage: entry[14],
+                            percentageInt: parseInt(entry[14])
                         };
                         vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
                     }

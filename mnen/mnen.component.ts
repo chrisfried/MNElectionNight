@@ -2,6 +2,7 @@
 /// <reference path="mnen.service.ts" />
 /// <reference path="mnen.race.component.ts" />
 /// <reference path="mnen.edit.component.ts" />
+/// <reference path="mnen.settings.component.ts" />
 namespace mnenComponent {
   'use strict';
 
@@ -13,18 +14,19 @@ namespace mnenComponent {
     private racesArray: {}[];
     private lastUpdate: number;
     private nextUpdate: number;
-    private edit: boolean;
-    private settings: boolean;
+    private showEdit: boolean;
+    private showSettings: boolean;
     private updateList: (list: string | number) => void;
     private toggleSelectors: () => void;
     private toggleSettings: () => void;
+    private settings: {};
 
     public template: string = `
       <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
         <span class="navbar-text float-xs-right countdown">next check <span am-time-ago="$ctrl.nextUpdate"></span></span>
         <a class="navbar-brand" href="#">MN Election Night</a>
         <ul class="nav navbar-nav">
-          <li class="nav-item" ng-class="{ 'active': $ctrl.edit }">
+          <li class="nav-item" ng-class="{ 'active': $ctrl.showEdit }">
             <a class="nav-link" href="#" ng-click="$ctrl.toggleSelectors()">Select Races</a>
           </li>
           <li class="nav-item" ng-class="{ 'active': $ctrl.settings }">
@@ -33,10 +35,10 @@ namespace mnenComponent {
         </ul>
       </nav>
       <div class="container-fluid navbar-offset">
-        <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.edit"></mnen-edit>
-        <mnen-settings></mnen-settings>
+        <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.showEdit"></mnen-edit>
+        <mnen-settings settings="$ctrl.settings" toggleSettings="$ctrl.toggleSettings" ng-if="$ctrl.showSettings"></mnen-settings>
         <div class="card-columns">
-          <mnen-race race="race" class="card" ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id"></mnen-race>
+          <mnen-race race="race" settings="$ctrl.settings" class="card" ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id"></mnen-race>
         </div>
       </div>`;
 
@@ -54,10 +56,17 @@ namespace mnenComponent {
       vm.listsObject = {};
       vm.races = {};
       vm.racesArray = [];
-      vm.edit = false;
-      vm.settings = false;
+      vm.showEdit = false;
+      vm.showSettings = false;
       vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
+
+      vm.settings = angular.fromJson(localStorage['settings']) || {
+        voteCount: true,
+        votePercent: false,
+        partyText: true,
+        threshold: 0
+      };
 
       vm.$onInit = activate;
       vm.updateList = updateList;
@@ -74,16 +83,15 @@ namespace mnenComponent {
         }
         vm.lastUpdate = Date.now();
         vm.nextUpdate = vm.lastUpdate + 300000;
-        console.log(vm.lastUpdate);
         $timeout(activate, 300000);
       }
 
       function toggleSelectors() {
-        vm.edit = !vm.edit;
+        vm.showEdit = !vm.showEdit;
       }
 
       function toggleSettings() {
-        vm.settings = !vm.settings;
+        vm.showSettings = !vm.showSettings;
       }
 
       function updateList(list) {
@@ -134,7 +142,8 @@ namespace mnenComponent {
               party: entry[10],
               votes: entry[13],
               votesInt: parseInt(entry[13]),
-              percentage: entry[14]
+              percentage: entry[14],
+              percentageInt: parseInt(entry[14])
             };
             vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
           };
