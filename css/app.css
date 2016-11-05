@@ -46,6 +46,11 @@
 .countdown {
   color: #fff;
 }
+@media (min-width: 575px) and (max-width: 960px) {
+  .card-columns {
+    column-count: 2;
+  }
+}
 @media (min-width: 1300px) {
   .card-columns {
     column-count: 4;
