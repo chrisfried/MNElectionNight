@@ -4,6 +4,7 @@
 /// <reference path="mnen.edit.component.ts" />
 /// <reference path="mnen.settings.component.ts" />
 /// <reference path="mnen.aggregate.component.ts" />
+/// <reference path="mnen.about.component.ts" />
 namespace mnenComponent {
   'use strict';
 
@@ -17,9 +18,11 @@ namespace mnenComponent {
     private nextUpdate: number;
     private showEdit: boolean;
     private showSettings: boolean;
+    private showAbout: boolean;
     private updateList: (list: string | number) => void;
     private toggleSelectors: () => void;
     private toggleSettings: () => void;
+    private toggleAbout: () => void;
     private settings: {};
     private visibleRaces: {};
 
@@ -34,12 +37,16 @@ namespace mnenComponent {
           <li class="nav-item" ng-class="{ 'active': $ctrl.showSettings }">
             <a class="nav-link" href="#" ng-click="$ctrl.toggleSettings()">&#9881;</a>
           </li>
+          <li class="nav-item" ng-class="{ 'active': $ctrl.showAbout }">
+            <a class="nav-link" href="#" ng-click="$ctrl.toggleAbout()">&#x2139;</a>
+          </li>
         </ul>
       </nav>
       <div class="container-fluid navbar-offset">
         <mnen-edit lists="$ctrl.listsObject" visible="$ctrl.visibleRaces" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.showEdit"></mnen-edit>
         <mnen-settings settings="$ctrl.settings" toggle="$ctrl.toggleSettings" ng-if="$ctrl.showSettings"></mnen-settings>
         <div class="card-columns">
+          <mnen-about toggle="$ctrl.toggleAbout" ng-if="$ctrl.showAbout" class="card"></mnen-about>
           <mnen-aggregate visible="$ctrl.visibleRaces" lists="$ctrl.listsObject"></mnen-aggregate>
           <mnen-race race="race" settings="$ctrl.settings" class="card" ng-class="{'card-inverse': race.percentageReporting === 100}" ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id"></mnen-race>
         </div>
@@ -61,8 +68,10 @@ namespace mnenComponent {
       vm.racesArray = [];
       vm.showEdit = false;
       vm.showSettings = false;
+      vm.showAbout = false;
       vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
+      vm.toggleAbout = toggleAbout;
 
       vm.settings = angular.fromJson(localStorage['mnen-settings']) || {
         voteCount: true,
@@ -96,6 +105,10 @@ namespace mnenComponent {
 
       function toggleSettings() {
         vm.showSettings = !vm.showSettings;
+      }
+
+      function toggleAbout() {
+        vm.showAbout = !vm.showAbout;
       }
 
       function updateList(list) {
@@ -204,12 +217,21 @@ namespace mnenComponent {
 
       function updateLeaderboards(listId) {
         let list = vm.listsObject[listId];
-        let counts = {};
+        let counts = {
+          novotes: {
+            name: 'No Results',
+            complete: 0,
+            completePerc: 0,
+            incomplete: 0,
+            incompletePerc: 0,
+            total: 0
+          }
+        };
         let totalComplete = 0;
         for (let i in list.races) {
           let race = list.races[i];
           let leader = race.candidates[race.leader];
-          if (!counts[leader.party]) counts[leader.party] = {
+          if (leader && !counts[leader.party]) counts[leader.party] = {
             name: leader.party,
             complete: 0,
             completePerc: 0,
@@ -217,12 +239,19 @@ namespace mnenComponent {
             incompletePerc: 0,
             total: 0
           };
-          if (race.percentageReporting < 100) counts[leader.party]['incomplete']++;
+          if (!leader) {
+            counts.novotes.incomplete++;
+            counts.novotes.total++;
+          }
+          else if (race.percentageReporting < 100) {
+            counts[leader.party]['incomplete']++;
+            counts[leader.party]['total']++;
+          }
           else {
             totalComplete++;
             counts[leader.party]['complete']++;
+            counts[leader.party]['total']++;
           }
-          counts[leader.party]['total']++;
         }
         list.leaderboardArray = [];
         for (let j in counts) {
