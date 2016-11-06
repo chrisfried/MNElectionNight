@@ -1,11 +1,66 @@
-var pawdModule;
-(function (pawdModule) {
+var mnenModule;
+(function (mnenModule) {
     'use strict';
     angular
         .module('mnen', [
         'angularMoment'
     ]);
-})(pawdModule || (pawdModule = {}));
+})(mnenModule || (mnenModule = {}));
+/// <reference path="mnen.module.ts" />
+var mnenAggregateComponent;
+(function (mnenAggregateComponent) {
+    'use strict';
+    var MnenAggregateComponent = (function () {
+        function MnenAggregateComponent() {
+            this.bindings = {
+                lists: '<',
+                visible: '<'
+            };
+            this.lists = {};
+            this.template = "\n      <div class=\"card\" ng-if=\"aggregate.visibility.visible && aggregate.list.leaderboard\" ng-class=\"{'card-inverse': aggregate.list.completePerc === 100}\" ng-repeat=\"aggregate in $ctrl.aggregates\">\n        <div class=\"card-block\">\n          <div class=\"fill-bar precincts\" style=\"width: {{aggregate.list.completePerc}}%\"></div>\n          <h5 class=\"card-title\">{{::aggregate.name}}</h5>\n          <h6 class=\"card-subtitle text-muted\" ng-class=\"{'incomplete': aggregate.list.completePerc < 100}\">{{aggregate.list.complete}} of {{aggregate.list.total}} Seats with All Precincts Reporting</h6>\n        </div>\n        <ul class=\"list-group list-group-flush\">\n          <li class=\"list-group-item\" ng-repeat=\"party in aggregate.list.leaderboardArray | orderBy: '-total'\">\n            <span class=\"float-xs-right\">\n              <span>\n                <span ng-if=\"party.complete > 0\">Won {{party.complete}}</span>\n                <span ng-if=\"party.complete > 0 && party.incomplete > 0\">, </span>\n                <span ng-if=\"party.incomplete > 0\">Leading {{party.incomplete}}</span>\n              </span>\n            </span>\n            <div class=\"fill-bar complete\" style=\"width: {{party.completePerc}}%\" ng-class=\"{'dfl': party.name === 'DFL','gop': party.name === 'R'}\"></div>\n            <div class=\"fill-bar incomplete\" style=\"width: {{party.incompletePerc}}%; left: {{party.completePerc}}%\" ng-class=\"{'dfl': party.name === 'DFL','gop': party.name === 'R'}\"></div>\n            <span>{{::party.name}}</span>\n          </li>\n        </ul>\n      </div>";
+        }
+        MnenAggregateComponent.prototype.controller = function () {
+            var vm = this;
+            vm.$onInit = activate;
+            vm.aggregates = [
+                {
+                    id: 24,
+                    name: 'U.S. Congressional Seats'
+                },
+                {
+                    id: 30,
+                    name: 'MN State Senate Seats'
+                },
+                {
+                    id: 20,
+                    name: 'MN State Representative Seats'
+                }
+            ];
+            function activate() {
+                for (var i in vm.aggregates) {
+                    var id = vm.aggregates[i].id;
+                    if (!vm.lists[id])
+                        vm.lists[id] = {
+                            races: [],
+                            visible: false
+                        };
+                    vm.aggregates[i].list = vm.lists[id];
+                    if (!vm.visible['agg' + id]) {
+                        vm.visible['agg' + id] = {
+                            visible: true
+                        };
+                        localStorage['mnen-races'] = angular.toJson(vm.visible);
+                    }
+                    vm.aggregates[i].visibility = vm.visible['agg' + id];
+                }
+            }
+        };
+        return MnenAggregateComponent;
+    }());
+    angular
+        .module('mnen')
+        .component('mnenAggregate', new MnenAggregateComponent());
+})(mnenAggregateComponent || (mnenAggregateComponent = {}));
 /// <reference path="mnen.module.ts" />
 var mnenService;
 (function (mnenService) {
@@ -16,9 +71,9 @@ var mnenService;
             this.getResults = this.getResultsFunction;
         }
         MnenService.prototype.getResultsFunction = function (list) {
-            //  let race = '1'; // 2012
+            //  let race = '1'; // 2012 General
             //  let race = '99'; // 2016 Primary
-            var race = '100';
+            var race = '100'; // 2016 General
             return this.$http.get('/Results/MediaResult/' + race + '?mediafileid=' + list)
                 .then(this.getResultsComplete)
                 .catch(this.getResultsFailed);
@@ -39,7 +94,6 @@ var mnenService;
         .service('MnenService', MnenService);
 })(mnenService || (mnenService = {}));
 /// <reference path="mnen.module.ts" />
-/// <reference path="mnen.service.ts" />
 var mnenRaceComponent;
 (function (mnenRaceComponent) {
     'use strict';
@@ -67,14 +121,16 @@ var mnenEditComponent;
                 lists: '<',
                 update: '<',
                 races: '<',
-                toggle: '<'
+                toggle: '<',
+                visible: '<'
             };
-            this.template = "\n      <div class=\"card-columns\">\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">&#x1F3C1; Select Races</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Selectors</button>\n          </div>\n        </div>\n        <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n          <div class=\"card-block\">\n            <h6>{{::option.name}}</h6>\n            <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n              </button>\n            </div></p>\n            <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n              <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{::race.office}}</button>\n            </div>\n          </div>\n        </div>\n      </div>";
+            this.template = "\n      <div class=\"card-columns\">\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">&#x1F3C1; Select Races</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Choose which elections to watch.</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Selectors</button>\n          </div>\n        </div>\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6 class=\"card-title\">Seat Counts</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.visible['agg24'].visible}\" ng-click=\"$ctrl.toggleAggregate('24')\">U.S. House</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.visible['agg30'].visible}\" ng-click=\"$ctrl.toggleAggregate('30')\">MN Senate</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.visible['agg20'].visible}\" ng-click=\"$ctrl.toggleAggregate('20')\">MN Reps</button>\n            </div></p>\n          </div>\n        </div>\n        <div class=\"card\" ng-repeat=\"option in $ctrl.options track by option.id\">\n          <div class=\"card-block\">\n            <h6>{{::option.name}}</h6>\n            <p><div ng-if=\"$ctrl.lists[option.id].races.length > 1\" class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectAll(option.id)\">All</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-click=\"$ctrl.selectNone(option.id)\">None</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.lists[option.id].visible}\" ng-click=\"$ctrl.toggleList(option.id)\">\n                {{ $ctrl.lists[option.id].visible ? 'Hide List' : 'Show List' }}\n              </button>\n            </div></p>\n            <div class=\"btn-group-vertical\" ng-if=\"$ctrl.lists[option.id].visible || $ctrl.lists[option.id].races.length < 2\">\n              <button ng-repeat=\"race in $ctrl.lists[option.id].races\" type=\"button\" class=\"btn btn-outline-success\" ng-class=\"{'active': race.visible}\" ng-click=\"$ctrl.toggleRace(race.id)\">{{::race.office}}</button>\n            </div>\n          </div>\n        </div>\n      </div>";
         }
         MnenEditComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
             vm.toggleList = toggleList;
             vm.toggleRace = toggleRace;
+            vm.toggleAggregate = toggleAggregate;
             vm.selectAll = selectAll;
             vm.selectNone = selectNone;
             vm.options = [
@@ -112,18 +168,25 @@ var mnenEditComponent;
             function selectAll(listId) {
                 for (var i in vm.lists[listId].races) {
                     vm.lists[listId].races[i].visible = true;
-                    localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
+                    vm.visible[vm.lists[listId].races[i].id].visible = true;
+                    localStorage['mnen-races'] = angular.toJson(vm.visible);
                 }
             }
             function selectNone(listId) {
                 for (var i in vm.lists[listId].races) {
                     vm.lists[listId].races[i].visible = false;
-                    localStorage[vm.lists[listId].races[i].id] = vm.lists[listId].races[i].visible;
+                    vm.visible[vm.lists[listId].races[i].id].visible = false;
+                    localStorage['mnen-races'] = angular.toJson(vm.visible);
                 }
             }
             function toggleRace(raceId) {
                 vm.races[raceId].visible = !vm.races[raceId].visible;
-                localStorage[raceId] = vm.races[raceId].visible;
+                vm.visible[raceId].visible = vm.races[raceId].visible;
+                localStorage['mnen-races'] = angular.toJson(vm.visible);
+            }
+            function toggleAggregate(id) {
+                vm.visible['agg' + id].visible = !vm.visible['agg' + id].visible;
+                localStorage['mnen-races'] = angular.toJson(vm.visible);
             }
         };
         return MnenEditComponent;
@@ -153,7 +216,7 @@ var mnenSettingsComponent;
                 saveSettings();
             }
             function saveSettings() {
-                localStorage['settings'] = angular.toJson(vm.settings);
+                localStorage['mnen-settings'] = angular.toJson(vm.settings);
             }
         };
         return MnenSettingsComponent;
@@ -167,12 +230,13 @@ var mnenSettingsComponent;
 /// <reference path="mnen.race.component.ts" />
 /// <reference path="mnen.edit.component.ts" />
 /// <reference path="mnen.settings.component.ts" />
+/// <reference path="mnen.aggregate.component.ts" />
 var mnenComponent;
 (function (mnenComponent) {
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">auto refresh <span am-time-ago=\"$ctrl.nextUpdate\"></span></span>\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-race race=\"race\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.percentageReporting === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
+            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">auto refresh <span am-time-ago=\"$ctrl.nextUpdate\"></span></span>\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-aggregate visible=\"$ctrl.visibleRaces\" lists=\"$ctrl.listsObject\"></mnen-aggregate>\n          <mnen-race race=\"race\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.percentageReporting === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -191,12 +255,13 @@ var mnenComponent;
             vm.showSettings = false;
             vm.toggleSelectors = toggleSelectors;
             vm.toggleSettings = toggleSettings;
-            vm.settings = angular.fromJson(localStorage['settings']) || {
+            vm.settings = angular.fromJson(localStorage['mnen-settings']) || {
                 voteCount: true,
                 votePercent: false,
                 partyText: true,
                 threshold: 0
             };
+            vm.visibleRaces = angular.fromJson(localStorage['mnen-races']) || {};
             vm.$onInit = activate;
             vm.updateList = updateList;
             vm.lastUpdate = Date.now();
@@ -228,6 +293,8 @@ var mnenComponent;
                 });
             }
             function updateData(data, list) {
+                var leaderUpdates = {};
+                var leaderboardUpdate = false;
                 if (!vm.listsObject[list]) {
                     vm.listsObject[list] = {
                         races: [],
@@ -252,12 +319,19 @@ var mnenComponent;
                             candidatesArray: [],
                             percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
                             updated: Date.now(),
-                            list: vm.listsObject[list]
+                            list: vm.listsObject[list],
+                            leader: '',
+                            leaderVotes: 0
                         };
-                        if (localStorage[race])
-                            vm.races[race].visible = JSON.parse(localStorage[race]);
-                        else
+                        if (vm.visibleRaces[race])
+                            vm.races[race].visible = vm.visibleRaces[race].visible;
+                        else {
                             vm.races[race].visible = true;
+                            vm.visibleRaces[race] = {
+                                visible: true
+                            };
+                            localStorage['mnen-races'] = angular.toJson(vm.visibleRaces);
+                        }
                         vm.racesArray.push(vm.races[race]);
                         vm.listsObject[list]['races'].push(vm.races[race]);
                     }
@@ -276,6 +350,9 @@ var mnenComponent;
                         vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
                     }
                     ;
+                    if (!vm.races[race].leader) {
+                        leaderUpdates[race] = true;
+                    }
                     if (vm.races[race].reporting !== entry[11] ||
                         vm.races[race]['candidates'][candidate].votes !== entry[13] ||
                         vm.races[race]['candidates'][candidate].percentage !== entry[14]) {
@@ -286,8 +363,67 @@ var mnenComponent;
                         vm.races[race]['candidates'][candidate].votesInt = parseInt(entry[13]);
                         vm.races[race]['candidates'][candidate].percentage = entry[14];
                         vm.races[race].updated = Date.now();
+                        leaderUpdates[race] = true;
                     }
                 }
+                updateLeaders(leaderUpdates, list);
+            }
+            function updateLeaders(races, listId) {
+                var leaderboardChange = false;
+                for (var i in races) {
+                    var race = vm.races[i];
+                    var leader = race.leader;
+                    var leaderVotes = race.leaderVotes;
+                    for (var j in race.candidates) {
+                        var candidate = race.candidates[j];
+                        if (candidate.votesInt > leaderVotes) {
+                            leader = candidate.id;
+                            leaderVotes = candidate.votesInt;
+                        }
+                    }
+                    race.leaderVotes = leaderVotes;
+                    if (race.leader !== leader) {
+                        leaderboardChange = true;
+                        race.leader = leader;
+                    }
+                }
+                if (leaderboardChange && (listId === '20' || listId === '24' || listId === '30'))
+                    updateLeaderboards(listId);
+            }
+            function updateLeaderboards(listId) {
+                var list = vm.listsObject[listId];
+                var counts = {};
+                var totalComplete = 0;
+                for (var i in list.races) {
+                    var race = list.races[i];
+                    var leader = race.candidates[race.leader];
+                    if (!counts[leader.party])
+                        counts[leader.party] = {
+                            name: leader.party,
+                            complete: 0,
+                            completePerc: 0,
+                            incomplete: 0,
+                            incompletePerc: 0,
+                            total: 0
+                        };
+                    if (race.percentageReporting < 100)
+                        counts[leader.party]['incomplete']++;
+                    else {
+                        totalComplete++;
+                        counts[leader.party]['complete']++;
+                    }
+                    counts[leader.party]['total']++;
+                }
+                list.leaderboardArray = [];
+                for (var j in counts) {
+                    counts[j].completePerc = counts[j].complete / list.races.length * 100;
+                    counts[j].incompletePerc = counts[j].incomplete / list.races.length * 100;
+                    list.leaderboardArray.push(counts[j]);
+                }
+                list.leaderboard = counts;
+                list.complete = totalComplete;
+                list.total = list.races.length;
+                list.completePerc = totalComplete / list.races.length * 100;
             }
         };
         return MnenComponent;

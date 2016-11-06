@@ -1,4 +1,4 @@
-namespace pawdModule {
+namespace mnenModule {
   'use strict';
 
   angular

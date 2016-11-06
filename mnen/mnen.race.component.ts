@@ -1,5 +1,4 @@
 /// <reference path="mnen.module.ts" />
-/// <reference path="mnen.service.ts" />
 namespace mnenRaceComponent {
   'use strict';
 

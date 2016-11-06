@@ -3,6 +3,7 @@
 /// <reference path="mnen.race.component.ts" />
 /// <reference path="mnen.edit.component.ts" />
 /// <reference path="mnen.settings.component.ts" />
+/// <reference path="mnen.aggregate.component.ts" />
 namespace mnenComponent {
   'use strict';
 
@@ -20,6 +21,7 @@ namespace mnenComponent {
     private toggleSelectors: () => void;
     private toggleSettings: () => void;
     private settings: {};
+    private visibleRaces: {};
 
     public template: string = `
       <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
@@ -35,9 +37,10 @@ namespace mnenComponent {
         </ul>
       </nav>
       <div class="container-fluid navbar-offset">
-        <mnen-edit lists="$ctrl.listsObject" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.showEdit"></mnen-edit>
+        <mnen-edit lists="$ctrl.listsObject" visible="$ctrl.visibleRaces" toggle="$ctrl.toggleSelectors" races="$ctrl.races" update="$ctrl.updateList" ng-if="$ctrl.showEdit"></mnen-edit>
         <mnen-settings settings="$ctrl.settings" toggle="$ctrl.toggleSettings" ng-if="$ctrl.showSettings"></mnen-settings>
         <div class="card-columns">
+          <mnen-aggregate visible="$ctrl.visibleRaces" lists="$ctrl.listsObject"></mnen-aggregate>
           <mnen-race race="race" settings="$ctrl.settings" class="card" ng-class="{'card-inverse': race.percentageReporting === 100}" ng-repeat="race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id"></mnen-race>
         </div>
       </div>`;
@@ -61,13 +64,14 @@ namespace mnenComponent {
       vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
 
-      vm.settings = angular.fromJson(localStorage['settings']) || {
+      vm.settings = angular.fromJson(localStorage['mnen-settings']) || {
         voteCount: true,
         votePercent: false,
         partyText: true,
         threshold: 0
       };
 
+      vm.visibleRaces = angular.fromJson(localStorage['mnen-races']) || {};
       vm.$onInit = activate;
       vm.updateList = updateList;
 
@@ -102,6 +106,8 @@ namespace mnenComponent {
       }
 
       function updateData(data, list) {
+        let leaderUpdates = {};
+        let leaderboardUpdate = false;
         if (!vm.listsObject[list]) {
           vm.listsObject[list] = {
             races: [],
@@ -125,11 +131,19 @@ namespace mnenComponent {
               candidatesArray: [],
               percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
               updated: Date.now(),
-              list: vm.listsObject[list]
+              list: vm.listsObject[list],
+              leader: '',
+              leaderVotes: 0
             };
 
-            if (localStorage[race]) vm.races[race].visible = JSON.parse(localStorage[race]);
-            else vm.races[race].visible = true;
+            if (vm.visibleRaces[race]) vm.races[race].visible = vm.visibleRaces[race].visible;
+            else {
+              vm.races[race].visible = true;
+              vm.visibleRaces[race] = {
+                visible: true
+              }
+              localStorage['mnen-races'] = angular.toJson(vm.visibleRaces);
+            }
 
             vm.racesArray.push(vm.races[race]);
             vm.listsObject[list]['races'].push(vm.races[race]);
@@ -147,6 +161,9 @@ namespace mnenComponent {
             };
             vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
           };
+          if (!vm.races[race].leader) {
+            leaderUpdates[race] = true;
+          }
           if (vm.races[race].reporting !== entry[11] ||
               vm.races[race]['candidates'][candidate].votes !== entry[13] ||
               vm.races[race]['candidates'][candidate].percentage !== entry[14]) {
@@ -157,8 +174,66 @@ namespace mnenComponent {
                 vm.races[race]['candidates'][candidate].votesInt = parseInt(entry[13]);
                 vm.races[race]['candidates'][candidate].percentage = entry[14];
                 vm.races[race].updated = Date.now();
+                leaderUpdates[race] = true;
           }
         }
+        updateLeaders(leaderUpdates, list);
+      }
+
+      function updateLeaders(races, listId) {
+        let leaderboardChange = false;
+        for (let i in races) {
+          let race = vm.races[i];
+          let leader = race.leader;
+          let leaderVotes = race.leaderVotes;
+          for (let j in race.candidates) {
+            let candidate = race.candidates[j];
+            if (candidate.votesInt > leaderVotes) {
+              leader = candidate.id;
+              leaderVotes = candidate.votesInt;
+            }
+          }
+          race.leaderVotes = leaderVotes;
+          if (race.leader !== leader) {
+            leaderboardChange = true;
+            race.leader = leader;
+          }
+        }
+        if (leaderboardChange && (listId === '20' || listId === '24' || listId === '30')) updateLeaderboards(listId);
+      }
+
+      function updateLeaderboards(listId) {
+        let list = vm.listsObject[listId];
+        let counts = {};
+        let totalComplete = 0;
+        for (let i in list.races) {
+          let race = list.races[i];
+          let leader = race.candidates[race.leader];
+          if (!counts[leader.party]) counts[leader.party] = {
+            name: leader.party,
+            complete: 0,
+            completePerc: 0,
+            incomplete: 0,
+            incompletePerc: 0,
+            total: 0
+          };
+          if (race.percentageReporting < 100) counts[leader.party]['incomplete']++;
+          else {
+            totalComplete++;
+            counts[leader.party]['complete']++;
+          }
+          counts[leader.party]['total']++;
+        }
+        list.leaderboardArray = [];
+        for (let j in counts) {
+          counts[j].completePerc = counts[j].complete / list.races.length * 100;
+          counts[j].incompletePerc = counts[j].incomplete / list.races.length * 100;
+          list.leaderboardArray.push(counts[j])
+        }
+        list.leaderboard = counts;
+        list.complete = totalComplete;
+        list.total = list.races.length;
+        list.completePerc = totalComplete / list.races.length * 100;
       }
     }
   }

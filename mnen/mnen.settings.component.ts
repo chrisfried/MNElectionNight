@@ -67,7 +67,7 @@ namespace mnenSettingsComponent {
       }
 
       function saveSettings() {
-        localStorage['settings'] = angular.toJson(vm.settings);
+        localStorage['mnen-settings'] = angular.toJson(vm.settings);
       }
     }
   }

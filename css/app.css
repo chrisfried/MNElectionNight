@@ -11,8 +11,14 @@
 .dfl {
   background-color: rgba(100,100,255,.2);
 }
+.dfl.incomplete {
+  background-color: rgba(100,100,255,.1);
+}
 .gop {
   background-color: rgba(255,100,100,.2);
+}
+.gop.incomplete {
+  background-color: rgba(255,100,100,.1);
 }
 .card-block {
   position: relative;
