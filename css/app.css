@@ -4,6 +4,7 @@
   left: 0;
   bottom: 0;
   background-color: rgba(100,100,100,.2);
+  transition: width 1s;
 }
 .precincts {
   background-color: rgba(200,255,200,.2);
@@ -70,6 +71,7 @@
 }
 .card-inverse {
   background: #333;
+  transition: background 1s;
 }
 @media (min-width: 575px) and (max-width: 960px) {
   .card-columns {
