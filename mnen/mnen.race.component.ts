@@ -10,6 +10,7 @@ namespace mnenRaceComponent {
     };
 
     public template: string = `
+      <div ng-if="$ctrl.race.id === '0101'" class="card-header text-muted">Minnesota Presidential Results</div>
       <div class="card-block">
         <div class="fill-bar precincts" style="width: {{$ctrl.race.percentageReporting}}%"></div>
         <h5 class="card-title">{{::$ctrl.race.office}}</h5>
