@@ -147,6 +147,8 @@ namespace mnenComponent {
             let choice = contest.choices.choice[j];
             choice._totalVotes = parseInt(choice._totalVotes);
             contest.votes += choice._totalVotes;
+            let nameArray = choice._choiceName.split(/,(.+)?/);
+            if (nameArray[1]) choice._choiceName = nameArray[1] + ' ' + nameArray[0];
           }
 
           for (let j in contest.choices.choice) {
