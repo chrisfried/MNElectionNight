@@ -17,7 +17,7 @@ namespace mnenRaceComponent {
         <h6 class="card-subtitle text-muted" ng-class="{'incomplete': $ctrl.race._precinctsReportingPercent < 100}">{{$ctrl.race._precinctsReported}} of {{::$ctrl.race._precinctsParticipating}} Precincts Reporting<span ng-if="$ctrl.race._precinctsReportingPercent !== 100"></span><span ng-if="$ctrl.race._numberToElect > 1">, {{$ctrl.race._numberToElect}} to Elect</span></h6>
       </div>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item" ng-repeat="candidate in $ctrl.race.choices.choice | orderBy: '-_totalVotes' track by candidate._key">
+        <li ng-if="candidate.percentage >= $ctrl.settings.threshold" class="list-group-item" ng-repeat="candidate in $ctrl.race.choices.choice | orderBy: '-_totalVotes' track by candidate._key">
           <span class="float-xs-right">
             <span ng-if="$ctrl.settings.votePercent">{{candidate.percentage}}%</span>
             <span ng-if="$ctrl.settings.voteCount && $ctrl.settings.votePercent"> - </span>

@@ -64,7 +64,8 @@ namespace mnenComponent {
       vm.settings = angular.fromJson(localStorage['mnen-settings']) || {
         voteCount: true,
         votePercent: false,
-        partyText: true
+        partyText: true,
+        threshold: 0
       };
 
       vm.visibleRaces = angular.fromJson(localStorage['mnen-races']) || {};
