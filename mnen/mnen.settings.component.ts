@@ -45,7 +45,7 @@ namespace mnenSettingsComponent {
         
         <div class="card">
           <div class="card-block">
-            <h6>Countdown Timer</h6>
+            <h6>Refresh Timer</h6>
             <p><div class="btn-group" role="group">
               <button type="button" class="btn btn-outline-primary" ng-class="{'active': $ctrl.settings.countdown}" ng-click="$ctrl.toggleSetting('countdown')">Display</button>
               <button type="button" class="btn btn-outline-primary" ng-class="{'active': $ctrl.settings.minicountdown}" ng-click="$ctrl.toggleSetting('minicountdown')">Minimal</button>

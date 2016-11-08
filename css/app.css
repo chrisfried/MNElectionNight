@@ -122,6 +122,22 @@
   }
 }
 
+.countdown {
+  display: none;
+}
+.countdown.mobile-countdown {
+  display: inline-block;
+}
+
+@media (min-width: 700px) {
+  .countdown {
+    display: inline-block;
+  }
+  .countdown.mobile-countdown {
+    display: none;
+  }
+}
+
 @media (min-width: 575px) and (max-width: 960px) {
   .card-columns {
     column-count: 2;
