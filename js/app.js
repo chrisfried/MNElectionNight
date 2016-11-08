@@ -2,9 +2,7 @@ var mnenModule;
 (function (mnenModule) {
     'use strict';
     angular
-        .module('mnen', [
-        'angularMoment'
-    ]);
+        .module('mnen', []);
 })(mnenModule || (mnenModule = {}));
 /// <reference path="mnen.module.ts" />
 var mnenAboutComponent;
@@ -222,7 +220,7 @@ var mnenSettingsComponent;
                 toggle: '<',
                 settings: '<'
             };
-            this.template = "\n      <div class=\"card-columns\">\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">&#9881; Settings</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Toggles for days!</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Settings</button>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Candidate Votes</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.voteCount}\" ng-click=\"$ctrl.toggleSetting('voteCount')\">Count</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.votePercent}\" ng-click=\"$ctrl.toggleSetting('votePercent')\">Percent</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Party Initials</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.partyText}\" ng-click=\"$ctrl.toggleSetting('partyText')\">Display</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Hide By Vote Threshold</h6>\n            <p><div class=\"input-group\">\n              <input type=\"number\" min=\"0\" max=\"100\" step=\"0.1\"class=\"form-control\" ng-model=\"$ctrl.settings.threshold\" ng-change=\"$ctrl.saveSettings()\">\n              <span class=\"input-group-addon\">%</span>\n            </div></p>\n          </div>\n        </div>\n\n      </div>";
+            this.template = "\n      <div class=\"card-columns\">\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">&#9881; Settings</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Toggles for days!</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Settings</button>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Candidate Votes</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.voteCount}\" ng-click=\"$ctrl.toggleSetting('voteCount')\">Count</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.votePercent}\" ng-click=\"$ctrl.toggleSetting('votePercent')\">Percent</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Party Initials</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.partyText}\" ng-click=\"$ctrl.toggleSetting('partyText')\">Display</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Countdown Timer</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.countdown}\" ng-click=\"$ctrl.toggleSetting('countdown')\">Display</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.minicountdown}\" ng-click=\"$ctrl.toggleSetting('minicountdown')\">Minimal</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Hide By Vote Threshold</h6>\n            <p><div class=\"input-group\">\n              <input type=\"number\" min=\"0\" max=\"100\" step=\"0.1\"class=\"form-control\" ng-model=\"$ctrl.settings.threshold\" ng-change=\"$ctrl.saveSettings()\">\n              <span class=\"input-group-addon\">%</span>\n            </div></p>\n          </div>\n        </div>\n\n      </div>";
         }
         MnenSettingsComponent.prototype.controller = function () {
             var vm = this;
@@ -254,7 +252,7 @@ var mnenComponent;
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">Updated {{ $ctrl.lastUpdate | date:'h:mma'}}, auto refresh <span am-time-ago=\"$ctrl.nextUpdate\"></span></span>\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showAbout }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleAbout()\">&#x2139;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-about toggle=\"$ctrl.toggleAbout\" ng-if=\"$ctrl.showAbout\" class=\"card\"></mnen-about>\n          <mnen-aggregate visible=\"$ctrl.visibleRaces\" lists=\"$ctrl.listsObject\"></mnen-aggregate>\n          <mnen-race race=\"race\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.percentageReporting === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
+            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"!$ctrl.settings.minicountdown\"><span ng-if=\"$ctrl.settings.countdown\">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>\n          <span ng-if=\"$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0\">{{ $ctrl.countdown }}</span>\n        </span>\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showAbout }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleAbout()\">&#x2139;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-about toggle=\"$ctrl.toggleAbout\" ng-if=\"$ctrl.showAbout\" class=\"card\"></mnen-about>\n          <mnen-aggregate visible=\"$ctrl.visibleRaces\" lists=\"$ctrl.listsObject\"></mnen-aggregate>\n          <mnen-race race=\"race\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.percentageReporting === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -275,30 +273,45 @@ var mnenComponent;
             vm.toggleSelectors = toggleSelectors;
             vm.toggleSettings = toggleSettings;
             vm.toggleAbout = toggleAbout;
+            vm.countdown = 0;
+            vm.updating = false;
             vm.settings = angular.fromJson(localStorage['mnen-settings']) || {
                 voteCount: true,
                 votePercent: false,
                 partyText: true,
-                threshold: 0
+                threshold: 0,
+                countdown: true,
+                minicountdown: false
             };
             vm.visibleRaces = angular.fromJson(localStorage['mnen-races']) || {};
             vm.$onInit = activate;
             vm.updateList = updateList;
             vm.lastUpdate = Date.now();
-            vm.nextUpdate = vm.lastUpdate + 300000;
+            vm.nextUpdate = vm.lastUpdate + 30000;
+            var countdownStarted = false;
             function activate() {
+                vm.updating = true;
+                if (!countdownStarted) {
+                    countdownStarted = true;
+                    updateCountdown();
+                }
                 var _loop_1 = function(i) {
                     MnenService.getResults(vm.lists[i])
                         .then(function (data) {
                         updateData(data, vm.lists[i]);
+                        vm.updating = false;
                     });
                 };
                 for (var i in vm.lists) {
                     _loop_1(i);
                 }
                 vm.lastUpdate = Date.now();
-                vm.nextUpdate = vm.lastUpdate + 300000;
-                $timeout(activate, 300000);
+                vm.nextUpdate = vm.lastUpdate + 30000;
+                $timeout(activate, 30000);
+            }
+            function updateCountdown() {
+                vm.countdown = Math.floor((vm.nextUpdate - Date.now()) / 1000);
+                $timeout(updateCountdown, 1000);
             }
             function toggleSelectors() {
                 vm.showEdit = !vm.showEdit;
