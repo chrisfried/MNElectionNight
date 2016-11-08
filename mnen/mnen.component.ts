@@ -105,17 +105,20 @@ namespace mnenComponent {
           countdownStarted = true;
           updateCountdown();
         }
-
+        let loadedCount = 0;
         for (let i in vm.lists) {
           MnenService.getResults(vm.lists[i])
-            .then(function (data: string) {
+            .then(function(data: string) {
               updateData(data, vm.lists[i]);
-              vm.updating = false;
+              loadedCount++;
+              if (loadedCount === vm.lists.length) {
+                vm.updating = false;
+                vm.lastUpdate = Date.now();
+                vm.nextUpdate = vm.lastUpdate + 30000;
+                $timeout(activate, 30000);
+              }
             });
         }
-        vm.lastUpdate = Date.now();
-        vm.nextUpdate = vm.lastUpdate + 30000;
-        $timeout(activate, 30000);
       }
 
       function updateCountdown() {

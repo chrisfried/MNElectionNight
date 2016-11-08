@@ -295,19 +295,23 @@ var mnenComponent;
                     countdownStarted = true;
                     updateCountdown();
                 }
+                var loadedCount = 0;
                 var _loop_1 = function(i) {
                     MnenService.getResults(vm.lists[i])
                         .then(function (data) {
                         updateData(data, vm.lists[i]);
-                        vm.updating = false;
+                        loadedCount++;
+                        if (loadedCount === vm.lists.length) {
+                            vm.updating = false;
+                            vm.lastUpdate = Date.now();
+                            vm.nextUpdate = vm.lastUpdate + 30000;
+                            $timeout(activate, 30000);
+                        }
                     });
                 };
                 for (var i in vm.lists) {
                     _loop_1(i);
                 }
-                vm.lastUpdate = Date.now();
-                vm.nextUpdate = vm.lastUpdate + 30000;
-                $timeout(activate, 30000);
             }
             function updateCountdown() {
                 vm.countdown = Math.floor((vm.nextUpdate - Date.now()) / 1000);
