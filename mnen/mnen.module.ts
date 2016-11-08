@@ -3,6 +3,5 @@ namespace mnenModule {
 
   angular
     .module('mnen', [
-      'angularMoment'
     ]);
 }

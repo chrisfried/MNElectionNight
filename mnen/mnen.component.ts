@@ -22,10 +22,16 @@ namespace mnenComponent {
     private toggleAbout: () => void;
     private settings: {};
     private visibleRaces: {};
+    private countdown: number;
+    private updating: boolean;
 
     public template: string = `
       <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-        <span class="navbar-text float-xs-right countdown">Updated {{ $ctrl.lastUpdate | date:'h:mma'}}, auto refresh <span am-time-ago="$ctrl.nextUpdate"></span></span>
+        <span class="navbar-text float-xs-right countdown">
+          <div class="spinner" ng-if="$ctrl.updating" ng-class="{'mini': $ctrl.settings.minicountdown}"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>
+          <span ng-if="!$ctrl.settings.minicountdown"><span ng-if="$ctrl.settings.countdown">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>
+          <span ng-if="$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0">{{ $ctrl.countdown }}</span>
+        </span>
         <a class="navbar-brand" href="#">AZ Election Night</a>
         <ul class="nav navbar-nav">
           <li class="nav-item" ng-class="{ 'active': $ctrl.showEdit }">
@@ -60,28 +66,46 @@ namespace mnenComponent {
       vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
       vm.toggleAbout = toggleAbout;
+      vm.countdown = 0;
+      vm.updating = false;
 
       vm.settings = angular.fromJson(localStorage['mnen-settings']) || {
         voteCount: true,
         votePercent: false,
         partyText: true,
-        threshold: 0
+        threshold: 0,
+        countdown: true,
+        minicountdown: false
       };
 
       vm.visibleRaces = angular.fromJson(localStorage['mnen-races']) || {};
       vm.$onInit = activate;
 
       vm.lastUpdate = Date.now();
-      vm.nextUpdate = vm.lastUpdate + 300000;
+      vm.nextUpdate = vm.lastUpdate + 30000;
+
+      let countdownStarted = false;
 
       function activate() {
+        vm.updating = true;
+        if (!countdownStarted) {
+          countdownStarted = true;
+          updateCountdown();
+        }
+
         MnenService.getResults()
           .then(function (data: string) {
             updateData(data);
+            vm.updating = false;
           });
         vm.lastUpdate = Date.now();
-        vm.nextUpdate = vm.lastUpdate + 300000;
-        $timeout(activate, 300000);
+        vm.nextUpdate = vm.lastUpdate + 30000;
+        $timeout(activate, 30000);
+      }
+
+      function updateCountdown() {
+        vm.countdown = Math.floor((vm.nextUpdate - Date.now()) / 1000);
+        $timeout(updateCountdown, 1000);
       }
 
       function toggleSelectors() {

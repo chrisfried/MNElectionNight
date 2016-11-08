@@ -45,6 +45,16 @@ namespace mnenSettingsComponent {
         
         <div class="card">
           <div class="card-block">
+            <h6>Countdown Timer</h6>
+            <p><div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary" ng-class="{'active': $ctrl.settings.countdown}" ng-click="$ctrl.toggleSetting('countdown')">Display</button>
+              <button type="button" class="btn btn-outline-primary" ng-class="{'active': $ctrl.settings.minicountdown}" ng-click="$ctrl.toggleSetting('minicountdown')">Minimal</button>
+            </div></p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-block">
             <h6>Hide By Vote Threshold</h6>
             <p><div class="input-group">
               <input type="number" min="0" max="100" step="0.1"class="form-control" ng-model="$ctrl.settings.threshold" ng-change="$ctrl.saveSettings()">
