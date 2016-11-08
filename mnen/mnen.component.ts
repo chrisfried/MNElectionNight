@@ -35,6 +35,11 @@ namespace mnenComponent {
           <span ng-if="!$ctrl.settings.minicountdown"><span ng-if="$ctrl.settings.countdown">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>
           <span ng-if="$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0">{{ $ctrl.countdown }}</span>
         </span>
+        <span class="navbar-text float-xs-right countdown mobile-countdown">
+          <div class="spinner" ng-if="$ctrl.updating" ng-class="{'mini': $ctrl.settings.minicountdown}"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>
+          <span ng-if="$ctrl.settings.countdown && !$ctrl.updating">{{ $ctrl.countdown }}</span>
+        </span>
+
         <a class="navbar-brand" href="#">MN Election Night</a>
         <ul class="nav navbar-nav">
           <li class="nav-item" ng-class="{ 'active': $ctrl.showEdit }">
