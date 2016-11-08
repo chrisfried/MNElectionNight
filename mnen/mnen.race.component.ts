@@ -26,7 +26,7 @@ namespace mnenRaceComponent {
           <div class="fill-bar" style="width: {{candidate.percentage}}%" ng-class="{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}"></div>
           <span ng-class="{'winner': $first && $ctrl.race.percentageReporting === 100}">
             <span class="capitalize">{{::candidate.name | lowercase}}</span>
-            <span ng-if="$ctrl.settings.partyText"> - {{::candidate.party}}</span>
+            <span class="tag tag-default" ng-class="{'tag-primary': candidate.party === 'DFL','tag-danger': candidate.party === 'R', 'tag-success': candidate.party === 'GP', 'tag-warning': candidate.party === 'LIB'}" ng-if="$ctrl.settings.partyText">{{::candidate.party}}</span>
           </span>
         </li>
       </ul>
