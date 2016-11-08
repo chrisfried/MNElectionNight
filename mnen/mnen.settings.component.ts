@@ -42,16 +42,6 @@ namespace mnenSettingsComponent {
             </div></p>
           </div>
         </div>
-        
-        <div class="card">
-          <div class="card-block">
-            <h6>Hide By Vote Threshold</h6>
-            <p><div class="input-group">
-              <input type="number" min="0" max="100" step="0.1"class="form-control" ng-model="$ctrl.settings.threshold" ng-change="$ctrl.saveSettings()">
-              <span class="input-group-addon">%</span>
-            </div></p>
-          </div>
-        </div>
 
       </div>`;
 

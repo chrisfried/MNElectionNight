@@ -4,23 +4,22 @@ namespace mnenService {
 
   export class MnenService {
     static $inject: Array<string> = ['$http'];
-    public getResults: (list: string) => ng.IHttpPromise<any>;
+    public getResults: () => ng.IHttpPromise<any>;
 
     constructor(private $http: ng.IHttpService) {
       this.getResults = this.getResultsFunction;
     }
 
-    private getResultsFunction(list) {
-    //  let race = '1'; // 2012 General
-    //  let race = '99'; // 2016 Primary
-      let race = '100'; // 2016 General
-      return this.$http.get('/Results/MediaResult/' + race + '?mediafileid=' + list)
+    private getResultsFunction() {
+      return this.$http.get('/ftp/dbelec/Results%20-%20State.xml')
         .then(this.getResultsComplete)
         .catch(this.getResultsFailed);
     }
 
     private getResultsComplete(response: ng.IHttpPromiseCallbackArg<any>): ng.IHttpPromiseCallback<any> {
-      return response.data;
+      let x2js = new X2JS();
+      let json = x2js.xml_str2json(response.data);
+      return json;
     }
 
     private getResultsFailed(error: ng.IHttpPromiseCallbackArg<any>): ng.IHttpPromiseCallback<any> {

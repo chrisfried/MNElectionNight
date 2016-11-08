@@ -10,23 +10,23 @@ namespace mnenRaceComponent {
     };
 
     public template: string = `
-      <div ng-if="$ctrl.race.id === '0101'" class="card-header text-muted">Minnesota Presidential Results</div>
+      <div ng-if="$ctrl.race._key === '590'" class="card-header text-muted">Arizona Presidential Results</div>
       <div class="card-block">
-        <div class="fill-bar precincts" style="width: {{$ctrl.race.percentageReporting}}%"></div>
-        <h5 class="card-title">{{::$ctrl.race.office}}</h5>
-        <h6 class="card-subtitle text-muted" ng-class="{'incomplete': $ctrl.race.percentageReporting < 100}">{{$ctrl.race.reporting}} of {{::$ctrl.race.precincts}} Precincts Reporting<span ng-if="$ctrl.race.percentageReporting !== 100"> @ {{ $ctrl.race.updated | date:'h:mma'}}</span></h6>
+        <div class="fill-bar precincts" style="width: {{$ctrl.race._precinctsReportingPercent}}%"></div>
+        <h5 class="card-title">{{::$ctrl.race._contestLongName}}</h5>
+        <h6 class="card-subtitle text-muted" ng-class="{'incomplete': $ctrl.race._precinctsReportingPercent < 100}">{{$ctrl.race._precinctsReported}} of {{::$ctrl.race._precinctsParticipating}} Precincts Reporting<span ng-if="$ctrl.race._precinctsReportingPercent !== 100"></span><span ng-if="$ctrl.race._numberToElect > 1">, {{$ctrl.race._numberToElect}} to Elect</span></h6>
       </div>
       <ul class="list-group list-group-flush">
-        <li ng-if="candidate.percentageInt >= $ctrl.settings.threshold" class="list-group-item" ng-repeat="candidate in $ctrl.race.candidatesArray | orderBy: '-votesInt' track by candidate.id">
+        <li class="list-group-item" ng-repeat="candidate in $ctrl.race.choices.choice | orderBy: '-_totalVotes' track by candidate._key">
           <span class="float-xs-right">
             <span ng-if="$ctrl.settings.votePercent">{{candidate.percentage}}%</span>
             <span ng-if="$ctrl.settings.voteCount && $ctrl.settings.votePercent"> - </span>
-            <span ng-if="$ctrl.settings.voteCount">{{candidate.votes}}</span>
+            <span ng-if="$ctrl.settings.voteCount">{{candidate._totalVotes}}</span>
           </span>
-          <div class="fill-bar" style="width: {{candidate.percentage}}%" ng-class="{'dfl': candidate.party === 'DFL','gop': candidate.party === 'R'}"></div>
-          <span ng-class="{'winner': $first && $ctrl.race.percentageReporting === 100}">
-            <span class="capitalize">{{::candidate.name | lowercase}}</span>
-            <span ng-if="$ctrl.settings.partyText"> - {{::candidate.party}}</span>
+          <div class="fill-bar" style="width: {{candidate.percentage}}%" ng-class="{'dfl': candidate._party === 'DEM','gop': candidate._party === 'REP'}"></div>
+          <span ng-class="{'winner': $first && $ctrl.race._precinctsReportingPercent === 100}">
+            <span class="capitalize">{{::candidate._choiceName | lowercase}}</span>
+            <span ng-if="$ctrl.settings.partyText"> - {{::candidate._party}}</span>
           </span>
         </li>
       </ul>
