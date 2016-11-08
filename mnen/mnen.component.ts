@@ -25,7 +25,7 @@ namespace mnenComponent {
 
     public template: string = `
       <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-        <span class="navbar-text float-xs-right countdown">auto refresh <span am-time-ago="$ctrl.nextUpdate"></span></span>
+        <span class="navbar-text float-xs-right countdown">Updated {{ $ctrl.lastUpdate | date:'h:mma'}}, auto refresh <span am-time-ago="$ctrl.nextUpdate"></span></span>
         <a class="navbar-brand" href="#">AZ Election Night</a>
         <ul class="nav navbar-nav">
           <li class="nav-item" ng-class="{ 'active': $ctrl.showEdit }">
