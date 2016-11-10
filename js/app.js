@@ -221,7 +221,7 @@ var mnenComponent;
     'use strict';
     var MnenComponent = (function () {
         function MnenComponent() {
-            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"!$ctrl.settings.minicountdown\"><span ng-if=\"$ctrl.settings.countdown\">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>\n          <span ng-if=\"$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0\">{{ $ctrl.countdown }}</span>\n        </span>\n        <span class=\"navbar-text float-xs-right countdown mobile-countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"$ctrl.settings.countdown && !$ctrl.updating\">{{ $ctrl.countdown }}</span>\n        </span>\n\n        <a class=\"navbar-brand\" href=\"#\">AZ Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showAbout }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleAbout()\">&#x2139;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-about toggle=\"$ctrl.toggleAbout\" ng-if=\"$ctrl.showAbout\" class=\"card\"></mnen-about>\n          <mnen-race race=\"race.contest\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.contest._precinctsReportingPercent === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } track by race.contest._key\"></mnen-race>\n        </div>\n      </div>";
+            this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span ng-if=\"$ctrl.liveUpdating\" class=\"navbar-text float-xs-right countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"!$ctrl.settings.minicountdown\"><span ng-if=\"$ctrl.settings.countdown\">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>\n          <span ng-if=\"$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0\">{{ $ctrl.countdown }}</span>\n        </span>\n        <span ng-if=\"$ctrl.liveUpdating\" class=\"navbar-text float-xs-right countdown mobile-countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"$ctrl.settings.countdown && !$ctrl.updating\">{{ $ctrl.countdown }}</span>\n        </span>\n\n        <a class=\"navbar-brand\" href=\"#\">AZ Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showAbout }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleAbout()\">&#x2139;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-about toggle=\"$ctrl.toggleAbout\" ng-if=\"$ctrl.showAbout\" class=\"card\"></mnen-about>\n          <mnen-race race=\"race.contest\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.contest._precinctsReportingPercent === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } track by race.contest._key\"></mnen-race>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
@@ -231,6 +231,7 @@ var mnenComponent;
             vm.showEdit = false;
             vm.showSettings = false;
             vm.showAbout = false;
+            vm.liveUpdating = false;
             vm.toggleSelectors = toggleSelectors;
             vm.toggleSettings = toggleSettings;
             vm.toggleAbout = toggleAbout;
@@ -253,7 +254,6 @@ var mnenComponent;
                 vm.updating = true;
                 if (!countdownStarted) {
                     countdownStarted = true;
-                    updateCountdown();
                 }
                 MnenService.getResults()
                     .then(function (data) {
@@ -262,7 +262,7 @@ var mnenComponent;
                 });
                 vm.lastUpdate = Date.now();
                 vm.nextUpdate = vm.lastUpdate + 30000;
-                $timeout(activate, 30000);
+                //  $timeout(activate, 30000);
             }
             function updateCountdown() {
                 vm.countdown = Math.floor((vm.nextUpdate - Date.now()) / 1000);
