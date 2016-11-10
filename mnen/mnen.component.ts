@@ -19,6 +19,7 @@ namespace mnenComponent {
     private showEdit: boolean;
     private showSettings: boolean;
     private showAbout: boolean;
+    private liveUpdating: boolean;
     private updateList: (list: string | number) => void;
     private toggleSelectors: () => void;
     private toggleSettings: () => void;
@@ -30,12 +31,12 @@ namespace mnenComponent {
 
     public template: string = `
       <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-        <span class="navbar-text float-xs-right countdown">
+        <span ng-if="$ctrl.liveUpdating" class="navbar-text float-xs-right countdown">
           <div class="spinner" ng-if="$ctrl.updating" ng-class="{'mini': $ctrl.settings.minicountdown}"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>
           <span ng-if="!$ctrl.settings.minicountdown"><span ng-if="$ctrl.settings.countdown">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>
           <span ng-if="$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0">{{ $ctrl.countdown }}</span>
         </span>
-        <span class="navbar-text float-xs-right countdown mobile-countdown">
+        <span ng-if="$ctrl.liveUpdating" class="navbar-text float-xs-right countdown mobile-countdown">
           <div class="spinner" ng-if="$ctrl.updating" ng-class="{'mini': $ctrl.settings.minicountdown}"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>
           <span ng-if="$ctrl.settings.countdown && !$ctrl.updating">{{ $ctrl.countdown }}</span>
         </span>
@@ -80,6 +81,7 @@ namespace mnenComponent {
       vm.showEdit = false;
       vm.showSettings = false;
       vm.showAbout = false;
+      vm.liveUpdating = false;
       vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
       vm.toggleAbout = toggleAbout;
@@ -108,7 +110,7 @@ namespace mnenComponent {
         vm.updating = true;
         if (!countdownStarted) {
           countdownStarted = true;
-          updateCountdown();
+        //  updateCountdown();
         }
         let loadedCount = 0;
         for (let i in vm.lists) {
@@ -120,7 +122,7 @@ namespace mnenComponent {
                 vm.updating = false;
                 vm.lastUpdate = Date.now();
                 vm.nextUpdate = vm.lastUpdate + 30000;
-                $timeout(activate, 30000);
+              //  $timeout(activate, 30000);
               }
             });
         }
