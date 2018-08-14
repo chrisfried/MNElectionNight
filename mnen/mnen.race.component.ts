@@ -3,7 +3,6 @@ namespace mnenRaceComponent {
   'use strict';
 
   class MnenRaceComponent implements ng.IComponentOptions {
-
     public bindings: { [binding: string]: string } = {
       race: '<',
       settings: '<'
@@ -36,7 +35,5 @@ namespace mnenRaceComponent {
       </div>`;
   }
 
-  angular
-    .module('mnen')
-    .component('mnenRace', new MnenRaceComponent());
+  angular.module('mnen').component('mnenRace', new MnenRaceComponent());
 }

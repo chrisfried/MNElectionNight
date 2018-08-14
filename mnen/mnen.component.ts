@@ -63,17 +63,25 @@ namespace mnenComponent {
         </div>
       </div>`;
 
-    public controller(MnenService: mnenService.MnenService, $timeout: ng.ITimeoutService): void {
+    public controller(
+      MnenService: mnenService.MnenService,
+      $timeout: ng.ITimeoutService
+    ): void {
       let vm = this;
 
       vm.lists = [
+        '23', // US Senate Statewide
+        '41', // US Senate by CD
+        '27', // US Senate by County
+        '24', // US House by CD
+        '60', // US House by County
+        '56', // Governor Statewide
+        '35', // AG
         '20', // State House
-        '22', // President
-        '24', // US House
-        '30', // State Senate
-        '37', // MN Supreme Court
-        '66' // Amendment
-      ]
+        '44' // District Court
+        // '10', // County Races
+        // '57' // School Board
+      ];
       vm.listsObject = {};
       vm.races = {};
       vm.racesArray = [];
@@ -112,17 +120,16 @@ namespace mnenComponent {
         }
         let loadedCount = 0;
         for (let i in vm.lists) {
-          MnenService.getResults(vm.lists[i])
-            .then(function(data: string) {
-              updateData(data, vm.lists[i]);
-              loadedCount++;
-              if (loadedCount === vm.lists.length) {
-                vm.updating = false;
-                vm.lastUpdate = Date.now();
-                vm.nextUpdate = vm.lastUpdate + 30000;
-                $timeout(activate, 30000);
-              }
-            });
+          MnenService.getResults(vm.lists[i]).then(data => {
+            updateData(data, vm.lists[i]);
+            loadedCount++;
+            if (loadedCount === vm.lists.length) {
+              vm.updating = false;
+              vm.lastUpdate = Date.now();
+              vm.nextUpdate = vm.lastUpdate + 30000;
+              $timeout(activate, 30000);
+            }
+          });
         }
       }
 
@@ -144,10 +151,9 @@ namespace mnenComponent {
       }
 
       function updateList(list) {
-        MnenService.getResults(list)
-          .then(function (data: string) {
-            updateData(data, list);
-          });
+        MnenService.getResults(list).then(data => {
+          updateData(data, list);
+        });
       }
 
       function updateData(data, list) {
@@ -163,7 +169,7 @@ namespace mnenComponent {
         for (let i = 0; i < dataArray.length; i++) {
           let entry = dataArray[i].split(';');
           let race = entry[3];
-          if (!race || race == '&nbsp' || race.length < 2) continue;
+          if (!race || race === '&nbsp' || race.length < 2) continue;
           if (!vm.races[race]) {
             vm.races[race] = {
               id: race,
@@ -174,25 +180,27 @@ namespace mnenComponent {
               votes: entry[15],
               candidates: {},
               candidatesArray: [],
-              percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
+              percentageReporting:
+                (parseInt(entry[11]) / parseInt(entry[12])) * 100,
               updated: Date.now(),
               list: vm.listsObject[list],
               leader: '',
               leaderVotes: 0
             };
 
-            if (vm.visibleRaces[race]) vm.races[race].visible = vm.visibleRaces[race].visible;
+            if (vm.visibleRaces[race])
+              vm.races[race].visible = vm.visibleRaces[race].visible;
             else {
               vm.races[race].visible = true;
               vm.visibleRaces[race] = {
                 visible: true
-              }
+              };
               localStorage['mnen-races'] = angular.toJson(vm.visibleRaces);
             }
 
             vm.racesArray.push(vm.races[race]);
             vm.listsObject[list]['races'].push(vm.races[race]);
-          };
+          }
           let candidate = entry[6];
           if (!vm.races[race]['candidates'][candidate]) {
             vm.races[race]['candidates'][candidate] = {
@@ -204,22 +212,29 @@ namespace mnenComponent {
               percentage: entry[14],
               percentageInt: parseFloat(entry[14])
             };
-            vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
-          };
+            vm.races[race]['candidatesArray'].push(
+              vm.races[race]['candidates'][candidate]
+            );
+          }
           if (!vm.races[race].leader) {
             leaderUpdates[race] = true;
           }
-          if (vm.races[race].reporting !== entry[11] ||
-              vm.races[race]['candidates'][candidate].votes !== entry[13] ||
-              vm.races[race]['candidates'][candidate].percentage !== entry[14]) {
-                vm.races[race].reporting = entry[11];
-                vm.races[race].percentageReporting = parseInt(entry[11]) / parseInt(entry[12]) * 100;
-                vm.races[race].votes = entry[15];
-                vm.races[race]['candidates'][candidate].votes = entry[13];
-                vm.races[race]['candidates'][candidate].votesInt = parseInt(entry[13]);
-                vm.races[race]['candidates'][candidate].percentage = entry[14];
-                vm.races[race].updated = Date.now();
-                leaderUpdates[race] = true;
+          if (
+            vm.races[race].reporting !== entry[11] ||
+            vm.races[race]['candidates'][candidate].votes !== entry[13] ||
+            vm.races[race]['candidates'][candidate].percentage !== entry[14]
+          ) {
+            vm.races[race].reporting = entry[11];
+            vm.races[race].percentageReporting =
+              (parseInt(entry[11]) / parseInt(entry[12])) * 100;
+            vm.races[race].votes = entry[15];
+            vm.races[race]['candidates'][candidate].votes = entry[13];
+            vm.races[race]['candidates'][candidate].votesInt = parseInt(
+              entry[13]
+            );
+            vm.races[race]['candidates'][candidate].percentage = entry[14];
+            vm.races[race].updated = Date.now();
+            leaderUpdates[race] = true;
           }
         }
         updateLeaders(leaderUpdates, list);
@@ -244,7 +259,11 @@ namespace mnenComponent {
             race.leader = leader;
           }
         }
-        if (leaderboardChange && (listId === '20' || listId === '24' || listId === '30')) updateLeaderboards(listId);
+        if (
+          leaderboardChange &&
+          (listId === '20' || listId === '24' || listId === '30')
+        )
+          updateLeaderboards(listId);
       }
 
       function updateLeaderboards(listId) {
@@ -263,23 +282,22 @@ namespace mnenComponent {
         for (let i in list.races) {
           let race = list.races[i];
           let leader = race.candidates[race.leader];
-          if (leader && !counts[leader.party]) counts[leader.party] = {
-            name: leader.party,
-            complete: 0,
-            completePerc: 0,
-            incomplete: 0,
-            incompletePerc: 0,
-            total: 0
-          };
+          if (leader && !counts[leader.party])
+            counts[leader.party] = {
+              name: leader.party,
+              complete: 0,
+              completePerc: 0,
+              incomplete: 0,
+              incompletePerc: 0,
+              total: 0
+            };
           if (!leader) {
             counts.novotes.incomplete++;
             counts.novotes.total++;
-          }
-          else if (race.percentageReporting < 100) {
+          } else if (race.percentageReporting < 100) {
             counts[leader.party]['incomplete']++;
             counts[leader.party]['total']++;
-          }
-          else {
+          } else {
             totalComplete++;
             counts[leader.party]['complete']++;
             counts[leader.party]['total']++;
@@ -287,19 +305,19 @@ namespace mnenComponent {
         }
         list.leaderboardArray = [];
         for (let j in counts) {
-          counts[j].completePerc = counts[j].complete / list.races.length * 100;
-          counts[j].incompletePerc = counts[j].incomplete / list.races.length * 100;
-          list.leaderboardArray.push(counts[j])
+          counts[j].completePerc =
+            (counts[j].complete / list.races.length) * 100;
+          counts[j].incompletePerc =
+            (counts[j].incomplete / list.races.length) * 100;
+          list.leaderboardArray.push(counts[j]);
         }
         list.leaderboard = counts;
         list.complete = totalComplete;
         list.total = list.races.length;
-        list.completePerc = totalComplete / list.races.length * 100;
+        list.completePerc = (totalComplete / list.races.length) * 100;
       }
     }
   }
 
-  angular
-    .module('mnen')
-    .component('mnen', new MnenComponent());
+  angular.module('mnen').component('mnen', new MnenComponent());
 }

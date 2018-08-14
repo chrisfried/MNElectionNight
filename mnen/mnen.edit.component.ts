@@ -3,7 +3,6 @@ namespace mnenEditComponent {
   'use strict';
 
   class MnenEditComponent implements ng.IComponentOptions {
-
     public bindings: { [binding: string]: string } = {
       lists: '<',
       update: '<',
@@ -60,7 +59,10 @@ namespace mnenEditComponent {
         </div>
       </div>`;
 
-    public controller(MnenService: mnenService.MnenService, $timeout: ng.ITimeoutService): void {
+    public controller(
+      MnenService: mnenService.MnenService,
+      $timeout: ng.ITimeoutService
+    ): void {
       let vm = this;
 
       vm.toggleList = toggleList;
@@ -97,7 +99,8 @@ namespace mnenEditComponent {
       ];
 
       function toggleList(listId) {
-        if (vm.lists[listId]) vm.lists[listId].visible = !vm.lists[listId].visible;
+        if (vm.lists[listId])
+          vm.lists[listId].visible = !vm.lists[listId].visible;
         else vm.update(listId);
       }
 
@@ -130,7 +133,5 @@ namespace mnenEditComponent {
     }
   }
 
-  angular
-    .module('mnen')
-    .component('mnenEdit', new MnenEditComponent());
+  angular.module('mnen').component('mnenEdit', new MnenEditComponent());
 }

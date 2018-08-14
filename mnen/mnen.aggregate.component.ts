@@ -3,7 +3,6 @@ namespace mnenAggregateComponent {
   'use strict';
 
   class MnenAggregateComponent implements ng.IComponentOptions {
-
     public bindings: { [binding: string]: string } = {
       lists: '<',
       visible: '<'
@@ -11,10 +10,10 @@ namespace mnenAggregateComponent {
 
     private lists = {};
     private aggregates: {
-      id: number,
-      name: string,
-      list?: {},
-      visibility?: {}
+      id: number;
+      name: string;
+      list?: {};
+      visibility?: {};
     }[];
     private $onInit: () => void;
     private visible;
@@ -65,21 +64,21 @@ namespace mnenAggregateComponent {
       function activate() {
         for (let i in vm.aggregates) {
           let id = vm.aggregates[i].id;
-          if (!vm.lists[id]) vm.lists[id] = {
-            races: [],
-            visible: false
-          }
+          if (!vm.lists[id])
+            vm.lists[id] = {
+              races: [],
+              visible: false
+            };
           vm.aggregates[i].list = vm.lists[id];
           if (!vm.visible['agg' + id]) {
             vm.visible['agg' + id] = {
               visible: true
-            }
+            };
             localStorage['mnen-races'] = angular.toJson(vm.visible);
           }
           vm.aggregates[i].visibility = vm.visible['agg' + id];
         }
       }
-
     }
   }
 

@@ -4,32 +4,37 @@ namespace mnenService {
 
   export class MnenService {
     static $inject: Array<string> = ['$http'];
-    public getResults: (list: string) => ng.IHttpPromise<any>;
+    public getResults: (
+      list: string
+    ) => ng.IPromise<ng.IHttpPromiseCallback<any>>;
 
     constructor(private $http: ng.IHttpService) {
       this.getResults = this.getResultsFunction;
     }
 
-    private getResultsFunction(list) {
-    //  let race = '1'; // 2012 General
-    //  let race = '99'; // 2016 Primary
-      let race = '100'; // 2016 General
-      return this.$http.get('/Results/MediaResult/' + race + '?mediafileid=' + list)
+    private getResultsFunction(list: string) {
+      //  let race = '1'; // 2012 General
+      //  let race = '99'; // 2016 Primary
+      let race = '114'; // 2016 General
+      return this.$http
+        .get('/Results/MediaResult/' + race + '?mediafileid=' + list)
         .then(this.getResultsComplete)
         .catch(this.getResultsFailed);
     }
 
-    private getResultsComplete(response: ng.IHttpPromiseCallbackArg<any>): ng.IHttpPromiseCallback<any> {
+    private getResultsComplete(
+      response: ng.IHttpPromiseCallbackArg<any>
+    ): ng.IHttpPromiseCallback<any> {
       return response.data;
     }
 
-    private getResultsFailed(error: ng.IHttpPromiseCallbackArg<any>): ng.IHttpPromiseCallback<any> {
+    private getResultsFailed(
+      error: ng.IHttpPromiseCallbackArg<any>
+    ): ng.IHttpPromiseCallback<any> {
       console.error(error);
       return;
     }
   }
 
-  angular
-    .module('mnen')
-    .service('MnenService', MnenService);
+  angular.module('mnen').service('MnenService', MnenService);
 }

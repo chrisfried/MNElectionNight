@@ -1,31 +1,28 @@
 var mnenModule;
 (function (mnenModule) {
     'use strict';
-    angular
-        .module('mnen', []);
+    angular.module('mnen', []);
 })(mnenModule || (mnenModule = {}));
 /// <reference path="mnen.module.ts" />
 var mnenAboutComponent;
 (function (mnenAboutComponent) {
     'use strict';
-    var MnenAboutComponent = (function () {
+    var MnenAboutComponent = /** @class */ (function () {
         function MnenAboutComponent() {
             this.bindings = {
                 toggle: '<'
             };
-            this.template = "\n      <div class=\"card-block\">\n        <h5 class=\"card-title\">&#x2139; About</h5>\n        <p>This app is meant to save you those precious moments normally spent manually refreshing a few dozen sos.state.mn.us tabs on election night.</p>\n        <p>Thrown together the weekend before election day 2016 by Chris Fried.</p>\n        <p>Data is pulled from text files provided by the Minnesota Secretary of State. You can see them <a href=\"http://electionresults.sos.state.mn.us/Select/Download/100\" target=\"_blank\">here</a>.</p>\n        <p>The code for this project is open source and can be found <a href=\"https://github.com/chrisfried/MNElectionNight\" target=\"_blank\">here</a>.</p>\n        <p>Questions, suggestions, and compliments can be directed <a href=\"https://twitter.com/chrisfried\" target=\"_blank\">@chrisfried</a> on Twitter.</p>\n        <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide About</button>\n      </div>";
+            this.template = "\n      <div class=\"card-block\">\n        <h5 class=\"card-title\">&#x2139; About</h5>\n        <p>This app is meant to save you those precious moments normally spent manually refreshing a few dozen sos.state.mn.us tabs on election night.</p>\n        <p>Thrown together the weekend before election day 2016 by Chris Fried.</p>\n        <p>Data is pulled from text files provided by the Minnesota Secretary of State. You can see them <a href=\"http://electionresults.sos.state.mn.us/Select/Download/114\" target=\"_blank\">here</a>.</p>\n        <p>The code for this project is open source and can be found <a href=\"https://github.com/chrisfried/MNElectionNight\" target=\"_blank\">here</a>.</p>\n        <p>Questions, suggestions, and compliments can be directed <a href=\"https://twitter.com/chrisfried\" target=\"_blank\">@chrisfried</a> on Twitter.</p>\n        <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide About</button>\n      </div>";
         }
         return MnenAboutComponent;
     }());
-    angular
-        .module('mnen')
-        .component('mnenAbout', new MnenAboutComponent());
+    angular.module('mnen').component('mnenAbout', new MnenAboutComponent());
 })(mnenAboutComponent || (mnenAboutComponent = {}));
 /// <reference path="mnen.module.ts" />
 var mnenAggregateComponent;
 (function (mnenAggregateComponent) {
     'use strict';
-    var MnenAggregateComponent = (function () {
+    var MnenAggregateComponent = /** @class */ (function () {
         function MnenAggregateComponent() {
             this.bindings = {
                 lists: '<',
@@ -80,7 +77,7 @@ var mnenAggregateComponent;
 var mnenService;
 (function (mnenService) {
     'use strict';
-    var MnenService = (function () {
+    var MnenService = /** @class */ (function () {
         function MnenService($http) {
             this.$http = $http;
             this.getResults = this.getResultsFunction;
@@ -88,8 +85,9 @@ var mnenService;
         MnenService.prototype.getResultsFunction = function (list) {
             //  let race = '1'; // 2012 General
             //  let race = '99'; // 2016 Primary
-            var race = '100'; // 2016 General
-            return this.$http.get('/Results/MediaResult/' + race + '?mediafileid=' + list)
+            var race = '114'; // 2016 General
+            return this.$http
+                .get('/Results/MediaResult/' + race + '?mediafileid=' + list)
                 .then(this.getResultsComplete)
                 .catch(this.getResultsFailed);
         };
@@ -104,15 +102,13 @@ var mnenService;
         return MnenService;
     }());
     mnenService.MnenService = MnenService;
-    angular
-        .module('mnen')
-        .service('MnenService', MnenService);
+    angular.module('mnen').service('MnenService', MnenService);
 })(mnenService || (mnenService = {}));
 /// <reference path="mnen.module.ts" />
 var mnenRaceComponent;
 (function (mnenRaceComponent) {
     'use strict';
-    var MnenRaceComponent = (function () {
+    var MnenRaceComponent = /** @class */ (function () {
         function MnenRaceComponent() {
             this.bindings = {
                 race: '<',
@@ -122,15 +118,13 @@ var mnenRaceComponent;
         }
         return MnenRaceComponent;
     }());
-    angular
-        .module('mnen')
-        .component('mnenRace', new MnenRaceComponent());
+    angular.module('mnen').component('mnenRace', new MnenRaceComponent());
 })(mnenRaceComponent || (mnenRaceComponent = {}));
 /// <reference path="mnen.module.ts" />
 var mnenEditComponent;
 (function (mnenEditComponent) {
     'use strict';
-    var MnenEditComponent = (function () {
+    var MnenEditComponent = /** @class */ (function () {
         function MnenEditComponent() {
             this.bindings = {
                 lists: '<',
@@ -206,21 +200,19 @@ var mnenEditComponent;
         };
         return MnenEditComponent;
     }());
-    angular
-        .module('mnen')
-        .component('mnenEdit', new MnenEditComponent());
+    angular.module('mnen').component('mnenEdit', new MnenEditComponent());
 })(mnenEditComponent || (mnenEditComponent = {}));
 /// <reference path="mnen.module.ts" />
 var mnenSettingsComponent;
 (function (mnenSettingsComponent) {
     'use strict';
-    var MnenSettingsComponent = (function () {
+    var MnenSettingsComponent = /** @class */ (function () {
         function MnenSettingsComponent() {
             this.bindings = {
                 toggle: '<',
                 settings: '<'
             };
-            this.template = "\n      <div class=\"card-columns\">\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">&#9881; Settings</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Toggles for days!</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Settings</button>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Candidate Votes</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.voteCount}\" ng-click=\"$ctrl.toggleSetting('voteCount')\">Count</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.votePercent}\" ng-click=\"$ctrl.toggleSetting('votePercent')\">Percent</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Party Initials</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.partyText}\" ng-click=\"$ctrl.toggleSetting('partyText')\">Display</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Refresh Timer</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.countdown}\" ng-click=\"$ctrl.toggleSetting('countdown')\">Display</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.minicountdown}\" ng-click=\"$ctrl.toggleSetting('minicountdown')\">Minimal</button>\n            </div></p>\n          </div>\n        </div>\n        \n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Hide By Vote Threshold</h6>\n            <p><div class=\"input-group\">\n              <input type=\"number\" min=\"0\" max=\"100\" step=\"0.1\"class=\"form-control\" ng-model=\"$ctrl.settings.threshold\" ng-change=\"$ctrl.saveSettings()\">\n              <span class=\"input-group-addon\">%</span>\n            </div></p>\n          </div>\n        </div>\n\n      </div>";
+            this.template = "\n      <div class=\"card-columns\">\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h5 class=\"card-title\">&#9881; Settings</h5>\n            <p><h6 class=\"card-subtitle text-muted\">Toggles for days!</h6></p>\n            <button type=\"button\" class=\"btn btn-outline-danger\" ng-click=\"$ctrl.toggle()\">Hide Settings</button>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Candidate Votes</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.voteCount}\" ng-click=\"$ctrl.toggleSetting('voteCount')\">Count</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.votePercent}\" ng-click=\"$ctrl.toggleSetting('votePercent')\">Percent</button>\n            </div></p>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Party Initials</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.partyText}\" ng-click=\"$ctrl.toggleSetting('partyText')\">Display</button>\n            </div></p>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Refresh Timer</h6>\n            <p><div class=\"btn-group\" role=\"group\">\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.countdown}\" ng-click=\"$ctrl.toggleSetting('countdown')\">Display</button>\n              <button type=\"button\" class=\"btn btn-outline-primary\" ng-class=\"{'active': $ctrl.settings.minicountdown}\" ng-click=\"$ctrl.toggleSetting('minicountdown')\">Minimal</button>\n            </div></p>\n          </div>\n        </div>\n\n        <div class=\"card\">\n          <div class=\"card-block\">\n            <h6>Hide By Vote Threshold</h6>\n            <p><div class=\"input-group\">\n              <input type=\"number\" min=\"0\" max=\"100\" step=\"0.1\"class=\"form-control\" ng-model=\"$ctrl.settings.threshold\" ng-change=\"$ctrl.saveSettings()\">\n              <span class=\"input-group-addon\">%</span>\n            </div></p>\n          </div>\n        </div>\n\n      </div>";
         }
         MnenSettingsComponent.prototype.controller = function () {
             var vm = this;
@@ -236,9 +228,7 @@ var mnenSettingsComponent;
         };
         return MnenSettingsComponent;
     }());
-    angular
-        .module('mnen')
-        .component('mnenSettings', new MnenSettingsComponent());
+    angular.module('mnen').component('mnenSettings', new MnenSettingsComponent());
 })(mnenSettingsComponent || (mnenSettingsComponent = {}));
 /// <reference path="mnen.module.ts" />
 /// <reference path="mnen.service.ts" />
@@ -250,19 +240,24 @@ var mnenSettingsComponent;
 var mnenComponent;
 (function (mnenComponent) {
     'use strict';
-    var MnenComponent = (function () {
+    var MnenComponent = /** @class */ (function () {
         function MnenComponent() {
             this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span class=\"navbar-text float-xs-right countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"!$ctrl.settings.minicountdown\"><span ng-if=\"$ctrl.settings.countdown\">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>\n          <span ng-if=\"$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0\">{{ $ctrl.countdown }}</span>\n        </span>\n        <span class=\"navbar-text float-xs-right countdown mobile-countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"$ctrl.settings.countdown && !$ctrl.updating\">{{ $ctrl.countdown }}</span>\n        </span>\n\n        <a class=\"navbar-brand\" href=\"#\">MN Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showAbout }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleAbout()\">&#x2139;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" update=\"$ctrl.updateList\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-about toggle=\"$ctrl.toggleAbout\" ng-if=\"$ctrl.showAbout\" class=\"card\"></mnen-about>\n          <mnen-aggregate visible=\"$ctrl.visibleRaces\" lists=\"$ctrl.listsObject\"></mnen-aggregate>\n          <mnen-race race=\"race\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.percentageReporting === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } | orderBy: 'id' track by race.id\"></mnen-race>\n        </div>\n      </div>";
         }
         MnenComponent.prototype.controller = function (MnenService, $timeout) {
             var vm = this;
             vm.lists = [
-                '20',
-                '22',
+                '23',
+                '41',
+                '27',
                 '24',
-                '30',
-                '37',
-                '66' // Amendment
+                '60',
+                '56',
+                '35',
+                '20',
+                '44' // District Court
+                // '10', // County Races
+                // '57' // School Board
             ];
             vm.listsObject = {};
             vm.races = {};
@@ -296,9 +291,8 @@ var mnenComponent;
                     updateCountdown();
                 }
                 var loadedCount = 0;
-                var _loop_1 = function(i) {
-                    MnenService.getResults(vm.lists[i])
-                        .then(function (data) {
+                for (var i in vm.lists) {
+                    MnenService.getResults(vm.lists[i]).then(function (data) {
                         updateData(data, vm.lists[i]);
                         loadedCount++;
                         if (loadedCount === vm.lists.length) {
@@ -308,9 +302,6 @@ var mnenComponent;
                             $timeout(activate, 30000);
                         }
                     });
-                };
-                for (var i in vm.lists) {
-                    _loop_1(i);
                 }
             }
             function updateCountdown() {
@@ -327,8 +318,7 @@ var mnenComponent;
                 vm.showAbout = !vm.showAbout;
             }
             function updateList(list) {
-                MnenService.getResults(list)
-                    .then(function (data) {
+                MnenService.getResults(list).then(function (data) {
                     updateData(data, list);
                 });
             }
@@ -345,7 +335,7 @@ var mnenComponent;
                 for (var i = 0; i < dataArray.length; i++) {
                     var entry = dataArray[i].split(';');
                     var race = entry[3];
-                    if (!race || race == '&nbsp' || race.length < 2)
+                    if (!race || race === '&nbsp' || race.length < 2)
                         continue;
                     if (!vm.races[race]) {
                         vm.races[race] = {
@@ -357,7 +347,7 @@ var mnenComponent;
                             votes: entry[15],
                             candidates: {},
                             candidatesArray: [],
-                            percentageReporting: parseInt(entry[11]) / parseInt(entry[12]) * 100,
+                            percentageReporting: (parseInt(entry[11]) / parseInt(entry[12])) * 100,
                             updated: Date.now(),
                             list: vm.listsObject[list],
                             leader: '',
@@ -375,7 +365,6 @@ var mnenComponent;
                         vm.racesArray.push(vm.races[race]);
                         vm.listsObject[list]['races'].push(vm.races[race]);
                     }
-                    ;
                     var candidate = entry[6];
                     if (!vm.races[race]['candidates'][candidate]) {
                         vm.races[race]['candidates'][candidate] = {
@@ -389,7 +378,6 @@ var mnenComponent;
                         };
                         vm.races[race]['candidatesArray'].push(vm.races[race]['candidates'][candidate]);
                     }
-                    ;
                     if (!vm.races[race].leader) {
                         leaderUpdates[race] = true;
                     }
@@ -397,7 +385,8 @@ var mnenComponent;
                         vm.races[race]['candidates'][candidate].votes !== entry[13] ||
                         vm.races[race]['candidates'][candidate].percentage !== entry[14]) {
                         vm.races[race].reporting = entry[11];
-                        vm.races[race].percentageReporting = parseInt(entry[11]) / parseInt(entry[12]) * 100;
+                        vm.races[race].percentageReporting =
+                            (parseInt(entry[11]) / parseInt(entry[12])) * 100;
                         vm.races[race].votes = entry[15];
                         vm.races[race]['candidates'][candidate].votes = entry[13];
                         vm.races[race]['candidates'][candidate].votesInt = parseInt(entry[13]);
@@ -427,7 +416,8 @@ var mnenComponent;
                         race.leader = leader;
                     }
                 }
-                if (leaderboardChange && (listId === '20' || listId === '24' || listId === '30'))
+                if (leaderboardChange &&
+                    (listId === '20' || listId === '24' || listId === '30'))
                     updateLeaderboards(listId);
             }
             function updateLeaderboards(listId) {
@@ -471,20 +461,20 @@ var mnenComponent;
                 }
                 list.leaderboardArray = [];
                 for (var j in counts) {
-                    counts[j].completePerc = counts[j].complete / list.races.length * 100;
-                    counts[j].incompletePerc = counts[j].incomplete / list.races.length * 100;
+                    counts[j].completePerc =
+                        (counts[j].complete / list.races.length) * 100;
+                    counts[j].incompletePerc =
+                        (counts[j].incomplete / list.races.length) * 100;
                     list.leaderboardArray.push(counts[j]);
                 }
                 list.leaderboard = counts;
                 list.complete = totalComplete;
                 list.total = list.races.length;
-                list.completePerc = totalComplete / list.races.length * 100;
+                list.completePerc = (totalComplete / list.races.length) * 100;
             }
         };
         return MnenComponent;
     }());
-    angular
-        .module('mnen')
-        .component('mnen', new MnenComponent());
+    angular.module('mnen').component('mnen', new MnenComponent());
 })(mnenComponent || (mnenComponent = {}));
 //# sourceMappingURL=app.js.map

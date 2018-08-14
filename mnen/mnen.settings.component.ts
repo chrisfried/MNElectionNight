@@ -3,7 +3,6 @@ namespace mnenSettingsComponent {
   'use strict';
 
   class MnenSettingsComponent implements ng.IComponentOptions {
-
     public bindings: { [binding: string]: string } = {
       toggle: '<',
       settings: '<'
@@ -33,7 +32,7 @@ namespace mnenSettingsComponent {
             </div></p>
           </div>
         </div>
-        
+
         <div class="card">
           <div class="card-block">
             <h6>Party Initials</h6>
@@ -42,7 +41,7 @@ namespace mnenSettingsComponent {
             </div></p>
           </div>
         </div>
-        
+
         <div class="card">
           <div class="card-block">
             <h6>Refresh Timer</h6>
@@ -52,7 +51,7 @@ namespace mnenSettingsComponent {
             </div></p>
           </div>
         </div>
-        
+
         <div class="card">
           <div class="card-block">
             <h6>Hide By Vote Threshold</h6>
@@ -82,7 +81,5 @@ namespace mnenSettingsComponent {
     }
   }
 
-  angular
-    .module('mnen')
-    .component('mnenSettings', new MnenSettingsComponent());
+  angular.module('mnen').component('mnenSettings', new MnenSettingsComponent());
 }
