@@ -8,7 +8,7 @@ var mnenModule;
 var mnenAboutComponent;
 (function (mnenAboutComponent) {
     'use strict';
-    var MnenAboutComponent = (function () {
+    var MnenAboutComponent = /** @class */ (function () {
         function MnenAboutComponent() {
             this.bindings = {
                 toggle: '<'
@@ -25,7 +25,7 @@ var mnenAboutComponent;
 var mnenAggregateComponent;
 (function (mnenAggregateComponent) {
     'use strict';
-    var MnenAggregateComponent = (function () {
+    var MnenAggregateComponent = /** @class */ (function () {
         function MnenAggregateComponent() {
             this.bindings = {
                 lists: '<',
@@ -80,13 +80,14 @@ var mnenAggregateComponent;
 var mnenService;
 (function (mnenService) {
     'use strict';
-    var MnenService = (function () {
+    var MnenService = /** @class */ (function () {
         function MnenService($http) {
             this.$http = $http;
             this.getResults = this.getResultsFunction;
         }
         MnenService.prototype.getResultsFunction = function () {
-            return this.$http.get('/ftp/dbelec/Results%20-%20State.xml')
+            return this.$http
+                .get('/ftp/ElectionResults/2018/State/2018%20Primary%20Election/Results.xml')
                 .then(this.getResultsComplete)
                 .catch(this.getResultsFailed);
         };
@@ -103,15 +104,13 @@ var mnenService;
         return MnenService;
     }());
     mnenService.MnenService = MnenService;
-    angular
-        .module('mnen')
-        .service('MnenService', MnenService);
+    angular.module('mnen').service('MnenService', MnenService);
 })(mnenService || (mnenService = {}));
 /// <reference path="mnen.module.ts" />
 var mnenRaceComponent;
 (function (mnenRaceComponent) {
     'use strict';
-    var MnenRaceComponent = (function () {
+    var MnenRaceComponent = /** @class */ (function () {
         function MnenRaceComponent() {
             this.bindings = {
                 race: '<',
@@ -129,7 +128,7 @@ var mnenRaceComponent;
 var mnenEditComponent;
 (function (mnenEditComponent) {
     'use strict';
-    var MnenEditComponent = (function () {
+    var MnenEditComponent = /** @class */ (function () {
         function MnenEditComponent() {
             this.bindings = {
                 lists: '<',
@@ -184,7 +183,7 @@ var mnenEditComponent;
 var mnenSettingsComponent;
 (function (mnenSettingsComponent) {
     'use strict';
-    var MnenSettingsComponent = (function () {
+    var MnenSettingsComponent = /** @class */ (function () {
         function MnenSettingsComponent() {
             this.bindings = {
                 toggle: '<',
@@ -219,7 +218,7 @@ var mnenSettingsComponent;
 var mnenComponent;
 (function (mnenComponent) {
     'use strict';
-    var MnenComponent = (function () {
+    var MnenComponent = /** @class */ (function () {
         function MnenComponent() {
             this.template = "\n      <nav class=\"navbar navbar-fixed-top navbar-dark bg-inverse\">\n        <span ng-if=\"$ctrl.liveUpdating\" class=\"navbar-text float-xs-right countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"!$ctrl.settings.minicountdown\"><span ng-if=\"$ctrl.settings.countdown\">auto refresh in {{ $ctrl.countdown }} seconds, </span>updated {{ $ctrl.lastUpdate | date:'h:mma'}}</span>\n          <span ng-if=\"$ctrl.settings.countdown && $ctrl.settings.minicountdown && !$ctrl.updating && $ctrl.countdown > 0\">{{ $ctrl.countdown }}</span>\n        </span>\n        <span ng-if=\"$ctrl.liveUpdating\" class=\"navbar-text float-xs-right countdown mobile-countdown\">\n          <div class=\"spinner\" ng-if=\"$ctrl.updating\" ng-class=\"{'mini': $ctrl.settings.minicountdown}\"><div class=\"double-bounce1\"></div><div class=\"double-bounce2\"></div></div>\n          <span ng-if=\"$ctrl.settings.countdown && !$ctrl.updating\">{{ $ctrl.countdown }}</span>\n        </span>\n\n        <a class=\"navbar-brand\" href=\"#\">AZ Election Night</a>\n        <ul class=\"nav navbar-nav\">\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showEdit }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSelectors()\">&#x1F3C1;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showSettings }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleSettings()\">&#9881;</a>\n          </li>\n          <li class=\"nav-item\" ng-class=\"{ 'active': $ctrl.showAbout }\">\n            <a class=\"nav-link\" href=\"#\" ng-click=\"$ctrl.toggleAbout()\">&#x2139;</a>\n          </li>\n        </ul>\n      </nav>\n      <div class=\"container-fluid navbar-offset\">\n        <mnen-edit lists=\"$ctrl.listsObject\" visible=\"$ctrl.visibleRaces\" toggle=\"$ctrl.toggleSelectors\" races=\"$ctrl.races\" ng-if=\"$ctrl.showEdit\"></mnen-edit>\n        <mnen-settings settings=\"$ctrl.settings\" toggle=\"$ctrl.toggleSettings\" ng-if=\"$ctrl.showSettings\"></mnen-settings>\n        <div class=\"card-columns\">\n          <mnen-about toggle=\"$ctrl.toggleAbout\" ng-if=\"$ctrl.showAbout\" class=\"card\"></mnen-about>\n          <mnen-race race=\"race.contest\" settings=\"$ctrl.settings\" class=\"card\" ng-class=\"{'card-inverse': race.contest._precinctsReportingPercent === 100}\" ng-repeat=\"race in $ctrl.racesArray | filter: { visible: true } track by race.contest._key\"></mnen-race>\n        </div>\n      </div>";
         }
@@ -254,9 +253,9 @@ var mnenComponent;
                 vm.updating = true;
                 if (!countdownStarted) {
                     countdownStarted = true;
+                    //  updateCountdown();
                 }
-                MnenService.getResults()
-                    .then(function (data) {
+                MnenService.getResults().then(function (data) {
                     updateData(data);
                     vm.updating = false;
                 });
@@ -310,7 +309,8 @@ var mnenComponent;
                             choice.percentage = 0;
                         }
                         else {
-                            choice.percentage = (choice._totalVotes / contest.votes * 100).toFixed(2);
+                            choice.percentage = ((choice._totalVotes / contest.votes) *
+                                100).toFixed(2);
                         }
                     }
                     if (!vm.races[race]) {
@@ -336,8 +336,6 @@ var mnenComponent;
         };
         return MnenComponent;
     }());
-    angular
-        .module('mnen')
-        .component('mnen', new MnenComponent());
+    angular.module('mnen').component('mnen', new MnenComponent());
 })(mnenComponent || (mnenComponent = {}));
 //# sourceMappingURL=app.js.map

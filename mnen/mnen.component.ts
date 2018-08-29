@@ -60,7 +60,10 @@ namespace mnenComponent {
         </div>
       </div>`;
 
-    public controller(MnenService: mnenService.MnenService, $timeout: ng.ITimeoutService): void {
+    public controller(
+      MnenService: mnenService.MnenService,
+      $timeout: ng.ITimeoutService
+    ): void {
       let vm = this;
 
       vm.listsObject = {};
@@ -97,17 +100,18 @@ namespace mnenComponent {
         vm.updating = true;
         if (!countdownStarted) {
           countdownStarted = true;
-        //  updateCountdown();
+          //  updateCountdown();
         }
 
-        MnenService.getResults()
-          .then(function (data: string) {
+        MnenService.getResults().then(
+          (data: ng.IHttpPromiseCallback<string>) => {
             updateData(data);
             vm.updating = false;
-          });
+          }
+        );
         vm.lastUpdate = Date.now();
         vm.nextUpdate = vm.lastUpdate + 30000;
-      //  $timeout(activate, 30000);
+        //  $timeout(activate, 30000);
       }
 
       function updateCountdown() {
@@ -139,9 +143,13 @@ namespace mnenComponent {
           let contest = contests[i];
           let race = contest._key;
 
-          contest._precinctsParticipating = parseInt(contest._precinctsParticipating);
+          contest._precinctsParticipating = parseInt(
+            contest._precinctsParticipating
+          );
           contest._precinctsReported = parseInt(contest._precinctsReported);
-          contest._precinctsReportingPercent = parseFloat(contest._precinctsReportingPercent);
+          contest._precinctsReportingPercent = parseFloat(
+            contest._precinctsReportingPercent
+          );
           contest._numberToElect = parseInt(contest._numberToElect);
 
           if (!angular.isArray(contest.choices.choice)) {
@@ -155,7 +163,8 @@ namespace mnenComponent {
             choice._totalVotes = parseInt(choice._totalVotes);
             contest.votes += choice._totalVotes;
             let nameArray = choice._choiceName.split(/,(.+)?/);
-            if (nameArray[1]) choice._choiceName = nameArray[1] + ' ' + nameArray[0];
+            if (nameArray[1])
+              choice._choiceName = nameArray[1] + ' ' + nameArray[0];
           }
 
           for (let j in contest.choices.choice) {
@@ -163,34 +172,34 @@ namespace mnenComponent {
             if (choice._totalVotes < 1) {
               choice.percentage = 0;
             } else {
-              choice.percentage = (choice._totalVotes / contest.votes * 100).toFixed(2);
+              choice.percentage = (
+                (choice._totalVotes / contest.votes) *
+                100
+              ).toFixed(2);
             }
           }
 
           if (!vm.races[race]) {
             vm.races[race] = {
               contest: contest
-            }
+            };
             vm.racesArray.push(vm.races[race]);
             vm.listsObject[0]['races'].push(vm.races[race]);
-          }
-          else vm.races[race].contest = contest;
+          } else vm.races[race].contest = contest;
 
-          if (vm.visibleRaces[race]) vm.races[race].visible = vm.visibleRaces[race].visible;
+          if (vm.visibleRaces[race])
+            vm.races[race].visible = vm.visibleRaces[race].visible;
           else {
             vm.races[race].visible = true;
             vm.visibleRaces[race] = {
               visible: true
-            }
+            };
             localStorage['mnen-races'] = angular.toJson(vm.visibleRaces);
           }
         }
       }
-
     }
   }
 
-  angular
-    .module('mnen')
-    .component('mnen', new MnenComponent());
+  angular.module('mnen').component('mnen', new MnenComponent());
 }
