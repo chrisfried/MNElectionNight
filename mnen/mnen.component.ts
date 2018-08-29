@@ -72,7 +72,7 @@ namespace mnenComponent {
       vm.showEdit = false;
       vm.showSettings = false;
       vm.showAbout = false;
-      vm.liveUpdating = false;
+      vm.liveUpdating = true;
       vm.toggleSelectors = toggleSelectors;
       vm.toggleSettings = toggleSettings;
       vm.toggleAbout = toggleAbout;
@@ -100,7 +100,7 @@ namespace mnenComponent {
         vm.updating = true;
         if (!countdownStarted) {
           countdownStarted = true;
-          //  updateCountdown();
+          updateCountdown();
         }
 
         MnenService.getResults().then(
@@ -111,7 +111,7 @@ namespace mnenComponent {
         );
         vm.lastUpdate = Date.now();
         vm.nextUpdate = vm.lastUpdate + 30000;
-        //  $timeout(activate, 30000);
+        $timeout(activate, 30000);
       }
 
       function updateCountdown() {

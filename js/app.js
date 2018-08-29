@@ -230,7 +230,7 @@ var mnenComponent;
             vm.showEdit = false;
             vm.showSettings = false;
             vm.showAbout = false;
-            vm.liveUpdating = false;
+            vm.liveUpdating = true;
             vm.toggleSelectors = toggleSelectors;
             vm.toggleSettings = toggleSettings;
             vm.toggleAbout = toggleAbout;
@@ -253,7 +253,7 @@ var mnenComponent;
                 vm.updating = true;
                 if (!countdownStarted) {
                     countdownStarted = true;
-                    //  updateCountdown();
+                    updateCountdown();
                 }
                 MnenService.getResults().then(function (data) {
                     updateData(data);
@@ -261,7 +261,7 @@ var mnenComponent;
                 });
                 vm.lastUpdate = Date.now();
                 vm.nextUpdate = vm.lastUpdate + 30000;
-                //  $timeout(activate, 30000);
+                $timeout(activate, 30000);
             }
             function updateCountdown() {
                 vm.countdown = Math.floor((vm.nextUpdate - Date.now()) / 1000);
