@@ -10,6 +10,7 @@ app.set('view engine', 'pug');
 
 app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
+app.use('/assets', express.static(path.join(__dirname, 'docs/assets')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/vendor', express.static(path.join(__dirname, 'vendor')));
