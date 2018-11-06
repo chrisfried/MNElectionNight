@@ -358,6 +358,8 @@ MIT
 
 @angular/material/card
 
+@angular/material/expansion
+
 @angular/forms
 MIT
 
