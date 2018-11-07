@@ -13,7 +13,6 @@ rand =
   // Courtesy of https://github.com/DestinyTrialsReport/DestinyTrialsReport/blob/05c113f8d39dee2a02461902f0c9e1c287cad3aa/server.js#L37
   router.get('/Results/*?', function(req, res) {
     if (cache[req.originalUrl]) {
-      console.log('cache');
       res.send(cache[req.originalUrl]);
     } else {
       res.setTimeout(25000);
@@ -23,7 +22,6 @@ rand =
       try {
         request(options, function(error, response, body) {
           if (!error) {
-            console.log('fresh');
             cache[req.originalUrl] = body;
             var wait = Math.floor(Math.random() * 30000) + 30000;
             setTimeout(() => (cache[req.originalUrl] = null), wait);
