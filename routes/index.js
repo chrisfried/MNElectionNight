@@ -9,28 +9,31 @@ router.get('/', function(req, res) {
 
 var cache = {};
 
-setInterval(() => (cache = {}), 30000);
-
-// Courtesy of https://github.com/DestinyTrialsReport/DestinyTrialsReport/blob/05c113f8d39dee2a02461902f0c9e1c287cad3aa/server.js#L37
-router.get('/Results/*?', function(req, res) {
-  if (cache[req.originalUrl]) {
-    res.send(cache[req.originalUrl]);
-  } else {
-    res.setTimeout(25000);
-    var options = {
-      url: 'http://electionresults.sos.state.mn.us/' + req.originalUrl
-    };
-    try {
-      request(options, function(error, response, body) {
-        if (!error) {
-          cache[req.originalUrl] = body;
-          res.send(body);
-        } else {
-          res.send(error);
-        }
-      });
-    } catch (e) {}
-  }
-});
+rand =
+  // Courtesy of https://github.com/DestinyTrialsReport/DestinyTrialsReport/blob/05c113f8d39dee2a02461902f0c9e1c287cad3aa/server.js#L37
+  router.get('/Results/*?', function(req, res) {
+    if (cache[req.originalUrl]) {
+      console.log('cache');
+      res.send(cache[req.originalUrl]);
+    } else {
+      res.setTimeout(25000);
+      var options = {
+        url: 'http://electionresults.sos.state.mn.us/' + req.originalUrl
+      };
+      try {
+        request(options, function(error, response, body) {
+          if (!error) {
+            console.log('fresh');
+            cache[req.originalUrl] = body;
+            var wait = Math.floor(Math.random() * 30000) + 30000;
+            setTimeout(() => (cache[req.originalUrl] = null), wait);
+            res.send(body);
+          } else {
+            res.send(error);
+          }
+        });
+      } catch (e) {}
+    }
+  });
 
 module.exports = router;
