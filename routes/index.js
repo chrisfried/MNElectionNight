@@ -23,7 +23,7 @@ rand =
         request(options, function(error, response, body) {
           if (!error) {
             cache[req.originalUrl] = body;
-            var wait = Math.floor(Math.random() * 30000) + 30000;
+            var wait = Math.floor(Math.random() * 30000) + 45000;
             setTimeout(() => (cache[req.originalUrl] = null), wait);
             res.send(body);
           } else {
